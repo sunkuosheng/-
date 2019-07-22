@@ -1,28 +1,46 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div id="app">
+
+        <login></login>
+       <!--<hello-world></hello-world>-->
+        <!--<main></main>-->
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
+   import login from './Login/Login.vue'
+   import HelloWorld from './components/HelloWorld'
+//   import  Header from './components/Header.vue'
+//   import head from './components/login.vue'
+   import Main from './main/Main.vue'
+    export default {
+        name: 'app',
+        components: {
+            login,HelloWorld,Main
+        }
+    }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+    /*.top {*/
+        /*width: 100%;*/
+        /*height: 200px;*/
+        /*!*background-image: url("./image/70319f7290452f66e9cc7d236f5133d.png");*!*/
+        /*!*background-repeat:no-repeat;*!*/
+        /*!*background-color: blue;*!*/
+        /*!*border: 1px red solid;*!*/
+    /*}*/
+    /*.top img{*/
+        /*width: 100%;*/
+        /*height: 100%;*/
+        /*background-size: cover;*/
+    /*}*/
+    /*.hear img {*/
+        /*background-color: blue;*/
+        /*color: red;*/
+    /*}*/
+
+    /*#app {*/
+        /*text-align: center;*/
+    /*}*/
 </style>
