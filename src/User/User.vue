@@ -10,35 +10,19 @@
             <el-button type="primary" size="medium" @click="dialogFormVisible = true">新增</el-button>
         </el-row>
         <el-table :data="tableData" style="width: 100%">
-            <el-table-column label="登录名" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.date }}</span>
-                </template>
+            <el-table-column
+                    prop="date"
+                    label="日期"
+                    width="180">
             </el-table-column>
-            <el-table-column label="密码" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.name }}</span>
-                </template>
+            <el-table-column
+                    prop="name"
+                    label="姓名"
+                    width="180">
             </el-table-column>
-            <el-table-column label="状态" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="地区" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="角色" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="openID" width="100">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.name }}</span>
-                </template>
+            <el-table-column
+                    prop="address"
+                    label="地址">
             </el-table-column>
             <el-table-column label="操作" width="180">
                 <template slot-scope="scope">
@@ -108,9 +92,7 @@
         methods: {
 //            回填
             handleEdit(index, row) {
-//                this.form.name = "";
-//                this.form.date = "";
-//                this.form.address = "";
+
 //                console.log(index, row);
 //                console.log(this.tableData[index]);
                 this.index=index;
@@ -130,10 +112,18 @@
             },
 //            修改和增加
             add(){
-                if(this.update===true)
+                if(this.update)
                 {
+
                     this.list=this.form;
-                    this.tableData.splice(this.index,1,this.list);
+//                    this.tableData.splice(this.index,1,this.list);
+
+                    console.log("当前",this.index);
+                    let tableDatum = this.tableData[this.index];
+                    tableDatum.name = this.form.name;
+                    tableDatum.date = this.form.date;
+                    tableDatum.address = this.form.address;
+
                     this.list="";
                     this.update=false;
                 }

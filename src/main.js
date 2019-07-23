@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import HelloWorld from '@/components/HelloWorld'
+
+import HelloWorld from './components/HelloWorld'
 import VueRouter from 'vue-router'
 import Login from '@/Login/Login.vue'
 import User from '@/User/User.vue'
@@ -11,6 +12,7 @@ import Auth from '@/Auth/Auth.vue'
 import Dictionaries from '@/Dictionaries/Dictionaries.vue'
 import Region from '@/Region/Region.vue'
 import Gather from '@/Gather/Gather.vue'
+Vue.use(ElementUI);
 
 import Accounts from '@/Accounts/Accounts.vue'
 import Gatheruser from '@/Gatheruser/Gatheruser.vue'

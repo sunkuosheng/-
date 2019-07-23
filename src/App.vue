@@ -1,26 +1,33 @@
 <template>
     <div id="app">
-
         <!--<login></login>-->
        <!--<hello-world></hello-world>-->
         <!--<main></main>-->
        <div class="coms">
         <router-view></router-view>
        </div>
+       <!--<hello-world></hello-world>-->
+        <!--<main></main>-->
+
     </div>
 </template>
 
 <script>
    import login from './Login/Login.vue'
    import HelloWorld from './components/HelloWorld'
+
    import User from './User/User.vue'
-//   import  Header from './components/Header.vue'
+
+//   import  Header from './components/Hader.vue'
 //   import head from './components/login.vue'
    import Main from './main/Main.vue'
     export default {
         name: 'app',
         components: {
+
 //            login,HelloWorld
+
+            login,HelloWorld,Main
         }
     }
 </script>
