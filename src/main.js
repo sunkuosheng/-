@@ -17,6 +17,7 @@ Vue.use(ElementUI);
 import Accounts from '@/Accounts/Accounts.vue'
 import Gatheruser from '@/Gatheruser/Gatheruser.vue'
 
+//测试一下git有没有问题
 Vue.use(VueRouter)
 Vue.use(ElementUI);
 
