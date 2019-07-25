@@ -23,7 +23,7 @@
 
 <script>
     import ElFormItem from "../../node_modules/element-ui/packages/form/src/form-item.vue";
-
+    import axios from 'axios'
     export default {
         components: {ElFormItem},
         name: 'login',
@@ -45,9 +45,13 @@
                 callback();
             };
             return {
+                sessionId:'',
+                username:'',
                 ruleForm2: {
                     pass: '',
-                    username: ''
+                    username: '',
+
+
                 },
                 rules2: {
                     username: [
@@ -58,17 +62,39 @@
                     ],
                 }
             };
+
         },
         methods: {
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$router.push({
+                        axios
+                            .get(
+                                'http://10.16.10.250:7001/sys/login/in?loginName='+this.ruleForm2.username+'&&loginPwd='+this.ruleForm2.pass
+                            )
+                            .then(response => {
+                                //打印sessionId
+                                console.log("sessionId    "+response.data.data);
+                                //将得到的数据赋值给sessionId
+                                (this.sessionId=response.data.data);
+                                //sessionId存在vuex
+                                this.$store.commit("getSessionId", this.sessionId);
+                                this.username=this.ruleForm2.username;
+                                //username存在vuex
+                                this.$store.commit('changeUsername',this.username);
+                            })
+                            .catch(function (error) { // 请求失败处理
+                                console.log(error);
+                            });
+
+                          this.$router.push({
                             name: `HelloWorld`,
                             params: {
                                 name: this.ruleForm2.username
                             }
                         })
+//                        this.$store.commit('getSessionId',this.sessionId);
+
                         alert('submit!');
                     } else {
                         console.log('error submit!!');
@@ -78,7 +104,24 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
-            }
+            },
+//            post: function () {
+//
+//                axios
+//                    .post(
+//                        'http://10.16.10.250:7001/sys/login/in  ',
+//                        {
+//                            loginName:this.ruleForm2.username,
+//                            password:this.ruleForm2.pass
+//                        }
+//                    )
+//                    .then(function (data) {
+//                        console.log(data);
+//                    })
+//                    .catch(function (error) { // 请求失败处理
+//                        console.log(error);
+//                    });
+//            }
         }
     }
 </script>

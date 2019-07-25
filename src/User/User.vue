@@ -1,6 +1,6 @@
 <template>
     <div class="el-main">
-        <el-row >
+        <el-row>
             <p>基本服务>用户管理</p>
         </el-row>
         <el-row>
@@ -9,79 +9,73 @@
             <el-button type="primary" size="medium" @click="selectuser">查询</el-button>
             <el-button type="primary" size="medium" @click="adduser">新增</el-button>
         </el-row>
-            <el-table :data="this.list.slice((currentPage-1)*pagesize,currentPage*pagesize)">
-                <!--<el-col :span="3">-->
-                    <el-table-column
-                            prop="name"
-                            label="登录名"
-                            sortable>
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="3">-->
-                    <el-table-column
-                            prop="password"
-                            label="密码"
-                            sortable>
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="2">-->
-                    <el-table-column
-                            prop="state"
-                            label="状态"
-                            sortable
-                            :formatter="stateFormatter">
-                        <!--思路formatter  -->
-                        <!--<slot>-->
-                        <!--<span>{{row.state === 0 ?"":""}}</span>-->
-                        <!--</slot>-->
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="4">-->
-                    <el-table-column
-                            prop="address"
-                            label="地址"
-                            sortable>
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="3">-->
-                    <el-table-column
-                            prop="role"
-                            sortable
-                            label="角色">
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="2">-->
-                    <el-table-column
-                            prop="openID"
-                            sortable
-                            label="openID">
-                    </el-table-column>
-                <!--</el-col>-->
-                <!--<el-col :span="5">-->
-                    <el-table-column label="操作">
-                        <template slot-scope="scope">
-                            <el-button size="mini" type="info" title="修改信息" icon="el-icon-setting"
-                                       @click="handleEdit(scope.$index, scope.row)"></el-button>
-                            <el-button size="mini" icon="el-icon-delete" title="删除信息" type="danger"
-                                       @click="handleDelete(scope.$index, scope.row)"></el-button>
-                        </template>
-                    </el-table-column>
-                <!--</el-col>-->
-            </el-table>
+        <el-table :data="this.list">
+            <!--<el-col :span="3">-->
+            <el-table-column
+                    prop="loginName"
+                    label="登录名"
+                    sortable>
+            </el-table-column>
+            <!--</el-col>-->
+            <!--<el-col :span="3">-->
+            <!--<el-table-column-->
+            <!--prop="password"-->
+            <!--label="密码"-->
+            <!--sortable>-->
+            <!--</el-table-column>-->
+            <!--</el-col>-->
+            <!--<el-col :span="2">-->
+            <!--<el-table-column-->
+            <!--prop="state"-->
+            <!--label="状态"-->
+            <!--sortable-->
+            <!--:formatter="stateFormatter">-->
+            <!--</el-table-column>-->
+            <!--</el-col>-->
+            <!--<el-col :span="4">-->
+            <el-table-column
+                    prop="dept.name"
+                    label="地址"
+                    sortable>
+            </el-table-column>
+            <!--</el-col>-->
+            <!--<el-col :span="3">-->
+            <el-table-column
+                    prop="role.name"
+                    sortable
+                    label="角色">
+            </el-table-column>
+            <!--</el-col>-->
+            <!--<el-col :span="2">-->
+            <!--<el-table-column-->
+            <!--prop="openID"-->
+            <!--sortable-->
+            <!--label="openID">-->
+            <!--</el-table-column>-->
+            <!--</el-col>-->
+            <!--<el-col :span="5">-->
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="info" title="修改信息" icon="el-icon-setting"
+                               @click="handleEdit(scope.$index, scope.row)"></el-button>
+                    <el-button size="mini" icon="el-icon-delete" title="删除信息" type="danger"
+                               @click="handleDelete(scope.$index, scope.row)"></el-button>
+                </template>
+            </el-table-column>
+            <!--</el-col>-->
+        </el-table>
 
-        <el-button  @click="userfrist">首页</el-button>
+        <el-button @click="userfrist">首页</el-button>
         <el-pagination
                 style="display: inline-block"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :page-size="2"
+                :page-size="1"
                 layout="prev, pager, next,jumper"
                 :total=this.list.length>
 
         </el-pagination>
-        <el-button  @click="userlast">尾页</el-button>
-
-
+        <el-button @click="userlast">尾页</el-button>
         <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="登录名" :label-width="formLabelWidth">
@@ -119,6 +113,7 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
@@ -131,36 +126,6 @@
         },
         data() {
             return {
-                tableData: [{
-                    name: '王小虎1',
-                    password: '123333',
-                    state: 0,
-                    address: '上海市普陀区金沙江路 1518 弄',
-                    role: '超级管理员',
-                    openID: 1,
-
-                }, {
-                    name: '王小虎2',
-                    password: '123333',
-                    state: 0,
-                    address: '上海市普陀区金沙江路 1518 弄',
-                    role: '超级管理员',
-                    openID: 1,
-                }, {
-                    name: '王小虎3',
-                    password: '123333',
-                    state: 0,
-                    address: '上海市普陀区金沙江路 1518 弄',
-                    role: '超级管理员',
-                    openID: 1,
-                }, {
-                    name: '王小虎4',
-                    password: '123333',
-                    state: 0,
-                    address: '上海市普陀区金沙江路 1518 弄',
-                    role: '超级管理员',
-                    openID: 1,
-                }],
                 input: '',
                 dialogFormVisible: false,
                 form: {
@@ -178,16 +143,15 @@
                 list: [],
                 gdlist: [],
 //                total:1000,//默认数据总数
-                pagesize: 2,//每页的数据条数
+                pagesize: 1,//每页的数据条数
                 currentPage: 1,//默认开始页面
+                id: '',
+//                total:this.list.length
             }
         },
         methods: {
 //            回填
             handleEdit(index, row) {
-
-//                console.log(index, row);
-//                console.log(this.tableData[index]);
                 this.index = index;
                 this.dialogFormVisible = true;
                 this.form.name = row.name;
@@ -204,8 +168,29 @@
             },
             //删除
             handleDelete(index, row) {
-                this.tableData.splice(index, 1);
-                console.log(index, row);
+//                this.list.splice(index, 1);
+                console.log(row);
+                let id = row._id;
+                console.log(row._id);
+                var param = {_id: id};
+                let sessionId = this.$store.state.sessionId
+                console.log(sessionId);
+                axios
+                    .get(
+                        'http://10.16.10.250:7001/sys/user/delete?id=' + id + ""
+                        , {
+                            headers: {
+                                'sessionId': sessionId
+                            }
+                        }
+                    )
+                    .then(function (data) {
+                        console.log(data);
+                    })
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+
             },
             adduser() {
                 this.form.name = "";
@@ -253,20 +238,54 @@
 //             查询
             selectuser() {
                 if (this.input.trim() !== "") {
-                    let newArr = [];
-                    for (let i = 0; i < this.tableData.length; i++) {
-                        let n = this.tableData[i].name.search(this.input);
-                        if (n !== -1) {
-                            newArr.push(this.tableData[i]);
+                    axios
+                        .get(
+//                            'http://10.16.10.250:7001/sys/user/list?loginName='+this.input+''
+                            'http://10.16.10.250:7001/sys/user/listForPage?queryName=' + this.input + ''
+//                    http://10.16.10.250:7001/sys/user/listForPage?queryName=&page=1&rows=10&type=admin
+                        )
+                        .then(response => {
+                                console.log("11",response);
+                                this.list = response.data.data.list;
+                                this.total = response.data.data.count;
+                                console.log("222",this.list);
                         }
-                    }
-                    this.list = newArr;
+
+                        )
+                        .catch(function (error) { // 请求失败处理
+                            console.log(error);
+                        });
+
                 }
                 else {
-                    this.list = this.tableData;
-                }
+                    axios
+                        .get(
+                            'http://10.16.10.250:7001/sys/user/list'
+                        )
+                        .then(response => (this.list = response.data.data)
+                        )
+                        .catch(function (error) { // 请求失败处理
+                            console.log(error);
+                        });
 
+                }
             },
+
+//                if (this.input.trim() !== "") {
+//                    let newArr = [];
+//                    for (let i = 0; i < this.tableData.length; i++) {
+//                        let n = this.tableData[i].name.search(this.input);
+//                        if (n !== -1) {
+//                            newArr.push(this.tableData[i]);
+//                        }
+//                    }
+//                    this.list = newArr;
+//                }
+//                else {
+//                    this.list = this.tableData;
+//                }
+
+
             filterHandle(value, row) {
                 return this.input === row.name;
 
@@ -304,39 +323,29 @@
         },
 
         watch: {
-            tableData(newV, oldV) {
-                this.list = newV;
-                this.gdlist = newV;
+            list(newV, oldV) {
+                console.log('我是新的');
                 console.log(newV);
+                console.log('我是老的');
+                console.log(oldV);
             },
 
         },
         mounted() {
-            this.list = this.tableData;
-            this.total = this.tableData.length;
+//            this.total = this.list.length;
         },
-        beforeCreate: function () {
-//            this.list=this.tableData;
-//            console.log(this.list);
-//            console.log(this.tableData);
-//            this.$nextTick(function() {
-////                console.log(this.tableData);
-//                this.list=this.tableData;
-//            })
-
+        //请求数据
+        created() {
+            axios
+                .get(
+                    'http://10.16.10.250:7001/sys/user/list'
+                )
+                .then(response => (this.list = response.data.data)
+                )
+                .catch(function (error) { // 请求失败处理
+                    console.log(error);
+                });
         },
-//        create:function () {
-//            this.list=this.tableData;
-//            console.log(123);
-//            console.log(this.list);
-//            console.log(this.tableData);
-//
-//        },
-//        berofeMount: function () {
-//            this.list = this.tableData;
-//            console.log(this.list);
-//            console.log(this.tableData);
-//        },
     }
 </script>
 <style>

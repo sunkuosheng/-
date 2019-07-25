@@ -9,7 +9,7 @@
                     <el-col :span="16" style="height: 100%">
                     </el-col>
                     <el-col :span="3" style="height: 100%">
-                        <p>欢迎你:{{this.$route.params.name}}</p>
+                        <p>欢迎你:{{this.$store.state.username}}</p>
                     </el-col>
                 </div>
             </el-row>

@@ -4,6 +4,12 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueRouter from 'vue-router'
 import {routes} from './routes/routes'
+import {store} from './store/store'
+import md5 from './plugins/md5'
+import Vuex from 'vuex'
+// Ä¬ÈÏURLÇëÇóÂ·¾¶
+// import axios from 'axios'
+// axios.defaults.baseURL = 'http://10.16.10.250:7001/sys/user/list'
 // import HelloWorld from './components/HelloWorld'
 // import Login from '@/Login/Login.vue'
 // import User from '@/User/User.vue'
@@ -16,6 +22,8 @@ import {routes} from './routes/routes'
 // import Gatheruser from '@/Gatheruser/Gatheruser.vue'
 Vue.use(VueRouter);
 Vue.use(ElementUI);
+Vue.use(md5);
+Vue.use(Vuex);
 
 // const routes = [
 //     //µÇÂ¼
@@ -50,5 +58,6 @@ Vue.config.productionTip = false
 
 new Vue({
     router,
+    store:store,
     render: h => h(App)
 }).$mount('#app')
