@@ -70,10 +70,9 @@
                 style="display: inline-block"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :page-size="1"
+                :page-size="2"
                 layout="prev, pager, next,jumper"
                 :total=this.list.length>
-
         </el-pagination>
         <el-button @click="userlast">尾页</el-button>
         <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
@@ -117,6 +116,10 @@
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
+    import storageUtil from '../util/storageUtil'
+    import {queryUserForPage} from '../api'
+    import {userDelete} from '../api'
+
 
     export default {
         components: {
@@ -150,7 +153,56 @@
             }
         },
         methods: {
-//            回填
+            //分页查询全部数据
+            async selesData() {
+                try {
+                    let result = await queryUserForPage({queryName: '', page: 1, rows: 10}, "GET")
+                    if (result.code == 0) {
+                        console.log(result.data.list);
+                        this.list = result.data.list;
+                        this.$message.success('获取列表成功')
+
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            async delData(id) {
+                try {
+                    let result = await userDelete({id:id}, "GET");
+
+                    if (result.code == 0) {
+                        this.$message.success('删除成功');
+                    }
+                    else {
+                        this.$message.error('删除失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            }
+            ,
+            //分页查询数据
+            loadData() {
+                axios
+                    .get(
+                        'http://127.0.0.1:7001/sys/dict/listForPage?fid=0&page=' + this.currentPage + '&rows=10'
+                    )
+                    .then(response => {
+                        this.list = response.data.data.list;
+                        this.total = this.list.length;
+                    })
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+            }
+            ,
+            //            回填
             handleEdit(index, row) {
                 this.index = index;
                 this.dialogFormVisible = true;
@@ -165,33 +217,51 @@
 //                console.log(row.date);
 //                console.log(row.address);
                 this.update = true;
-            },
+            }
+            ,
             //删除
             handleDelete(index, row) {
-//                this.list.splice(index, 1);
-                console.log(row);
-                let id = row._id;
-                console.log(row._id);
-                var param = {_id: id};
-                let sessionId = this.$store.state.sessionId
-                console.log(sessionId);
-                axios
-                    .get(
-                        'http://10.16.10.250:7001/sys/user/delete?id=' + id + ""
-                        , {
-                            headers: {
-                                'sessionId': sessionId
-                            }
-                        }
-                    )
-                    .then(function (data) {
-                        console.log(data);
-                    })
-                    .catch(function (error) { // 请求失败处理
-                        console.log(error);
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+//                    console.log(row);
+//                    let id = row._id;
+//                    console.log(row._id);
+//                    this.delData(row_id);
+//                var param = {_id: id};
+//                    let sessionId = this.$store.state.sessionId
+//                    console.log(sessionId);
+//                    axios
+//                        .get(
+//                            'http://127.0.0.1:7001/sys/user/delete?id=' + id + ""
+//                            , {
+//                                headers: {
+//                                    'sessionId': sessionId
+//                                }
+//                            }
+//                        )
+//                        .then(function (data) {
+//                            console.log(data);
+//                        })
+//                        .catch(function (error) { // 请求失败处理
+//                            console.log(error);
+//                        });
+//                    this.$message({
+//                        type: 'success',
+//                        message: '删除成功!'
+//                    });
+                    console.log('123');
+                    this.delData(row._id);
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
                     });
-
-            },
+                });
+            }
+            ,
             adduser() {
                 this.form.name = "";
                 this.form.address = "";
@@ -201,8 +271,9 @@
                 this.form.openID = "";
                 this.dialogFormVisible = true;
 
-            },
-//            修改和增加
+            }
+            ,
+            //            修改和增加
             add() {
                 if (this.update) {
                     console.log("当前", this.index);
@@ -234,118 +305,94 @@
                     this.list = this.tableData;
                 }
                 this.dialogFormVisible = false
-            },
-//             查询
+            }
+            ,
+            //             查询
             selectuser() {
                 if (this.input.trim() !== "") {
                     axios
                         .get(
-//                            'http://10.16.10.250:7001/sys/user/list?loginName='+this.input+''
-                            'http://10.16.10.250:7001/sys/user/listForPage?queryName=' + this.input + ''
-//                    http://10.16.10.250:7001/sys/user/listForPage?queryName=&page=1&rows=10&type=admin
+//                            'http://127.0.0.1:7001/sys/user/list?loginName='+this.input+''
+                            'http://127.0.0.1:7001/sys/user/listForPage?queryName=' + this.input + ''
+//                    http://127.0.0.1:7001/sys/user/listForPage?queryName=&page=1&rows=10&type=admin
                         )
                         .then(response => {
-                                console.log("11",response);
+                                console.log("11", response);
                                 this.list = response.data.data.list;
                                 this.total = response.data.data.count;
-                                console.log("222",this.list);
-                        }
-
+                                console.log("222", this.list);
+                            }
                         )
                         .catch(function (error) { // 请求失败处理
                             console.log(error);
                         });
-
                 }
                 else {
                     axios
                         .get(
-                            'http://10.16.10.250:7001/sys/user/list'
+                            'http://127.0.0.1:7001/sys/user/list'
                         )
                         .then(response => (this.list = response.data.data)
                         )
                         .catch(function (error) { // 请求失败处理
                             console.log(error);
                         });
-
                 }
-            },
-
-//                if (this.input.trim() !== "") {
-//                    let newArr = [];
-//                    for (let i = 0; i < this.tableData.length; i++) {
-//                        let n = this.tableData[i].name.search(this.input);
-//                        if (n !== -1) {
-//                            newArr.push(this.tableData[i]);
-//                        }
-//                    }
-//                    this.list = newArr;
-//                }
-//                else {
-//                    this.list = this.tableData;
-//                }
-
-
+            }
+            ,
             filterHandle(value, row) {
                 return this.input === row.name;
 
-            },
+            }
+            ,
             handleSizeChange: function (size) {
                 this.pagesize = size;
                 console.log(this.pagesize) //每页下拉显示数据
-            },
-
+            }
+            ,
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
                 console.log(this.currentPage) //点击第几页
-            },
-            //状态显示的变化
-            stateFormatter(row) {
-//                if(row.state===0)
-//                {
-//                    return '可用';
-//                }
-//                else
-//                {
-//                    return '禁用';
-//                }
-                return row.state == 0 ? '可用' : '禁用';
-            },
+            }
+            ,
             //首页
             userfrist() {
                 this.currentPage = 1;
-            },
+            }
+            ,
             //尾页
             userlast() {
                 this.currentPage = (this.list.length / 2);
             }
-
         },
-
         watch: {
             list(newV, oldV) {
                 console.log('我是新的');
                 console.log(newV);
                 console.log('我是老的');
                 console.log(oldV);
-            },
-
-        },
+            }
+            ,
+        }
+        ,
         mounted() {
 //            this.total = this.list.length;
-        },
+            this.selesData();
+        }
+        ,
         //请求数据
         created() {
-            axios
-                .get(
-                    'http://10.16.10.250:7001/sys/user/list'
-                )
-                .then(response => (this.list = response.data.data)
-                )
-                .catch(function (error) { // 请求失败处理
-                    console.log(error);
-                });
-        },
+//            axios
+//                .get(
+//                    'http://127.0.0.1:7001/sys/user/list'
+//                )
+//                .then(response => (this.list = response.data.data)
+//                )
+//                .catch(function (error) { // 请求失败处理
+//                    console.log(error);
+//                });
+        }
+        ,
     }
 </script>
 <style>

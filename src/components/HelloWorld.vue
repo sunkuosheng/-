@@ -9,7 +9,7 @@
                     <el-col :span="16" style="height: 100%">
                     </el-col>
                     <el-col :span="3" style="height: 100%">
-                        <p>欢迎你:{{this.$store.state.username}}</p>
+                        <p>欢迎你:{{name}}</p>
                     </el-col>
                 </div>
             </el-row>
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+    import storageUtil from  '../util/storageUtil'
     export default {
 
         name: 'HelloWorld',
@@ -95,14 +96,12 @@
                     children: 'children',
                     label: 'label'
                 },
-                name: '123',
+                name:'',
             };
         },
         methods: {
             //路由跳转
             handleNodeClick(data) {
-//                console.log(data.id);
-//                if(data.id===2){
                 this.$router.push({
                     name: data.path,
                     params: {
@@ -113,12 +112,13 @@
             },
             getRouterData() {
                 this.name = this.$route.params.name;
-//                console.log('name', this.$route.params.name)
-
 
             }
 
         },
+        mounted(){
+          this.name=storageUtil.read('loginName');
+        }
 
     };
 </script>

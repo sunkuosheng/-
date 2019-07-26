@@ -9,7 +9,7 @@ import md5 from './plugins/md5'
 import Vuex from 'vuex'
 // Ä¬ÈÏURLÇëÇóÂ·¾¶
 // import axios from 'axios'
-// axios.defaults.baseURL = 'http://10.16.10.250:7001/sys/user/list'
+// axios.defaults.baseURL = 'http://127.0.0.1:7001/sys/user/list'
 // import HelloWorld from './components/HelloWorld'
 // import Login from '@/Login/Login.vue'
 // import User from '@/User/User.vue'
