@@ -7,53 +7,23 @@
             <em>用户名</em>
             <el-input placeholder="用户名称" v-model="input" clearable style="width: 200px!important">用户名</el-input>
             <el-button type="primary" size="medium" @click="selectuser">查询</el-button>
-            <el-button type="primary" size="medium" @click="adduser">新增</el-button>
         </el-row>
         <el-table :data="this.list">
-            <!--<el-col :span="3">-->
             <el-table-column
                     prop="loginName"
                     label="登录名"
                     sortable>
             </el-table-column>
-            <!--</el-col>-->
-            <!--<el-col :span="3">-->
-            <!--<el-table-column-->
-            <!--prop="password"-->
-            <!--label="密码"-->
-            <!--sortable>-->
-            <!--</el-table-column>-->
-            <!--</el-col>-->
-            <!--<el-col :span="2">-->
-            <!--<el-table-column-->
-            <!--prop="state"-->
-            <!--label="状态"-->
-            <!--sortable-->
-            <!--:formatter="stateFormatter">-->
-            <!--</el-table-column>-->
-            <!--</el-col>-->
-            <!--<el-col :span="4">-->
             <el-table-column
                     prop="dept.name"
                     label="地址"
                     sortable>
             </el-table-column>
-            <!--</el-col>-->
-            <!--<el-col :span="3">-->
             <el-table-column
                     prop="role.name"
                     sortable
                     label="角色">
             </el-table-column>
-            <!--</el-col>-->
-            <!--<el-col :span="2">-->
-            <!--<el-table-column-->
-            <!--prop="openID"-->
-            <!--sortable-->
-            <!--label="openID">-->
-            <!--</el-table-column>-->
-            <!--</el-col>-->
-            <!--<el-col :span="5">-->
             <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button size="mini" type="info" title="修改信息" icon="el-icon-setting"
@@ -62,7 +32,6 @@
                                @click="handleDelete(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>
-            <!--</el-col>-->
         </el-table>
 
         <el-button @click="userfrist">首页</el-button>
@@ -210,12 +179,8 @@
                 this.form.address = row.address;
                 this.form.role = row.role;
                 this.form.password = row.password;
-//                this.form.state = row.state;
                 row.state === 0 ? this.form.state = '可用' : this.form.state = '禁用';
                 this.form.openID = row.openID;
-//                console.log(row.name);
-//                console.log(row.date);
-//                console.log(row.address);
                 this.update = true;
             }
             ,
@@ -226,32 +191,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-//                    console.log(row);
-//                    let id = row._id;
-//                    console.log(row._id);
-//                    this.delData(row_id);
-//                var param = {_id: id};
-//                    let sessionId = this.$store.state.sessionId
-//                    console.log(sessionId);
-//                    axios
-//                        .get(
-//                            'http://127.0.0.1:7001/sys/user/delete?id=' + id + ""
-//                            , {
-//                                headers: {
-//                                    'sessionId': sessionId
-//                                }
-//                            }
-//                        )
-//                        .then(function (data) {
-//                            console.log(data);
-//                        })
-//                        .catch(function (error) { // 请求失败处理
-//                            console.log(error);
-//                        });
-//                    this.$message({
-//                        type: 'success',
-//                        message: '删除成功!'
-//                    });
+
                     console.log('123');
                     this.delData(row._id);
                 }).catch(() => {
@@ -260,19 +200,7 @@
                         message: '已取消删除'
                     });
                 });
-            }
-            ,
-            adduser() {
-                this.form.name = "";
-                this.form.address = "";
-                this.form.role = "";
-                this.form.password = "";
-                this.form.state = "";
-                this.form.openID = "";
-                this.dialogFormVisible = true;
-
-            }
-            ,
+            },
             //            修改和增加
             add() {
                 if (this.update) {
@@ -312,7 +240,6 @@
                 if (this.input.trim() !== "") {
                     axios
                         .get(
-//                            'http://127.0.0.1:7001/sys/user/list?loginName='+this.input+''
                             'http://127.0.0.1:7001/sys/user/listForPage?queryName=' + this.input + ''
 //                    http://127.0.0.1:7001/sys/user/listForPage?queryName=&page=1&rows=10&type=admin
                         )
@@ -378,21 +305,11 @@
         mounted() {
 //            this.total = this.list.length;
             this.selesData();
-        }
-        ,
+        },
         //请求数据
         created() {
-//            axios
-//                .get(
-//                    'http://127.0.0.1:7001/sys/user/list'
-//                )
-//                .then(response => (this.list = response.data.data)
-//                )
-//                .catch(function (error) { // 请求失败处理
-//                    console.log(error);
-//                });
-        }
-        ,
+
+        },
     }
 </script>
 <style>

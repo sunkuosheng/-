@@ -4,7 +4,6 @@
             <p>基本服务>字典管理</p>
         </el-row>
         <el-table :data="list">
-            <!--<el-col :span="3">-->
             <el-table-column
                     label="序号"
                     type="index"
@@ -33,10 +32,9 @@
                 style="display: inline-block"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :page-size="2"
+                :page-size=pagesize
                 layout="prev, pager, next,jumper"
-                :total=this.list.length>
-
+                :total=total>
         </el-pagination>
         <el-button @click="userlast">尾页</el-button>
         <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible">
@@ -57,6 +55,9 @@
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
+    import {queryDictForPage} from '../api'
+    import {dictInsert} from '../api'
+
 
     export default {
         components: {
@@ -75,15 +76,15 @@
                     address: '',
                     role: '',
                     fid: '',
-                    _id:''
+                    _id: ''
                 },
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
                 gdlist: [],
-//                total:1000,//默认数据总数
-                pagesize: 2,//每页的数据条数
+                total: 1000,//默认数据总数
+                pagesize: 10,//每页的数据条数
                 currentPage: 1,//默认开始页面
                 id: '',
             }
@@ -137,75 +138,61 @@
                     console.log(tableId);
                     console.log(tableName);
                     //修改请求
-                    axios
-                        .post(
-                            'http://127.0.0.1:7001/sys/dict/update',
-                            {
-                                id: tableId,
-                                name: tableName
-                            }
-                        )
-                        .then(function (data) {
-                            console.log(data);
-                        })
-                        .catch(function (error) { // 请求失败处理
-                            console.log(error);
-                        });
+//                    axios
+//                        .post(
+//                            'http://127.0.0.1:7001/sys/dict/update',
+//                            {
+//                                id: tableId,
+//                                name: tableName
+//                            }
+//                        )
+//                        .then(function (data) {
+//                            console.log(data);
+//                        })
+//                        .catch(function (error) { // 请求失败处理
+//                            console.log(error);
+//                        });
+                    this.dictInsert(tableName, tableId);
                     this.update = false;
                 }
                 else {
-
-                    var fid=this.form.fid;
-                    //判断form的id有没有
-                    if (fid===undefined)
-                    {
-                        fid=0;
+                    console.log(this.form._id);
+                    var fid = this.id;
+                    //判断fid是为空还是为零
+                    //为空代表没有添加过，属于父级添加
+                    //为零代表代表添加过，属于子级添加
+                    if (fid == "") {
+                        fid = 0;
                     }
-                    else if(fid===0){
-                        fid=this.form._id;
+                    else if (fid == 0) {
+                        fid = this.form._id;
 
+                        console.log(123);
+                        console.log(this.form._id);
+                        console.log('我是fid', fid);
                     }
-                    console.log('我是fid',fid);
-                    console.log('我是id',this.form_id)
+                    console.log('我是fid', fid);
+                    console.log('我是id', this.form_id);
                     let name = this.form.name;
-                    //添加请求
-                    axios
-                        .post(
-                            'http://127.0.0.1:7001/sys/dict/add',
-                            {
-                                name: name,
-                                fid: fid
-                            }
-                        )
-                        .then(function (data) {
-//                            console.log('我是添加完之后返回的数据' + data);
-                        })
-                        .catch(function (error) { // 请求失败处理
-                            console.log(error);
-                        });
+                    this.dictInsert(name, fid);
                 }
                 this.loadData();
                 this.dialogFormVisible = false
-
             },
 //             查询
             selectuser() {
-
             },
             filterHandle(value, row) {
                 return this.input === row.name;
-
             },
             handleSizeChange: function (size) {
                 this.pagesize = size;
                 console.log(this.pagesize) //每页下拉显示数据
             },
-
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
                 console.log(this.currentPage) //点击第几页
                 this.loadData();
-
             },
             //首页
             userfrist() {
@@ -214,54 +201,66 @@
             },
             //尾页
             userlast() {
-                this.currentPage = (this.list.length / 20);
+                this.currentPage = (this.total / this.pagesize);
                 this.loadData()
             },
             //查看下一级
             handleEnd(index, row) {
                 //把id存起来
-                this.form.fid=this.list[index]._id;
-                console.log(this.form.fid);
-                console.log(row._id)
+                this.id = this.list[index]._id;
+//                console.log(this.form._id);
+//                console.log(row._id);
                 axios
                     .get(
                         'http://127.0.0.1:7001/sys/dict/list?fid=' + row._id + ''
                     )
                     .then(response => {
-                        this.list = response.data.data;
-
+                            this.list = response.data.data;
+                        }
+                    )
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+            },
+            //分页查询数据
+            async loadData() {
+                try {
+                    let result = await queryDictForPage({fid: 0, page: this.currentPage, rows: this.pagesize}, "GET");
+                    if (result.code == 0) {
+                        console.log(result.data.list);
+                        this.list = result.data.list;
+                        this.total = result.data.count;
+                        console.log(result.data.count);
+                        this.$message.success('获取列表成功')
                     }
-                    )
-                    .catch(function (error) { // 请求失败处理
-                        console.log(error);
-                    });
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //增加
+            async dictInsert(name, fid) {
+                try {
+                    let result = await dictInsert({name: name, fid: fid}, "POST");
+                    if (result.code == 0) {
+                        this.$message.success('添加成功')
+                    }
+                    else {
+                        this.$message.error('添加失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
 
-            },
-            //分页查询数据
-            loadData() {
-                axios
-                    .get(
-                        'http://127.0.0.1:7001/sys/dict/listForPage?fid=0&page=' + this.currentPage + '&rows=10'
-                    )
-                    .then(response => {
-                        this.list = response.data.data.list;
-                        this.total = this.list.length;
-                    })
-                    .catch(function (error) { // 请求失败处理
-                        console.log(error);
-                    });
-            },
+            }
 
         },
-
         mounted() {
             this.loadData();
-
-        },
-
-        //请求数据
-        created() {
-
         },
     }
 </script>
