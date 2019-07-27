@@ -57,8 +57,7 @@
     import ElCol from "element-ui/packages/col/src/col";
     import {queryDictForPage} from '../api'
     import {dictInsert} from '../api'
-
-
+    import {dictDelete} from '../api'
     export default {
         components: {
             ElCol,
@@ -100,28 +99,21 @@
             },
             //删除
             handleDelete(index, row) {
-//                this.list.splice(index, 1);
-                console.log(row);
-                let id = row._id;
-                console.log(row._id);
-                var param = {_id: id};
-                let sessionId = this.$store.state.sessionId
-                console.log(sessionId);
-                axios
-                    .get(
-                        'http://127.0.0.1:7001/sys/user/delete?id=' + id + ""
-                        , {
-                            headers: {
-                                'sessionId': sessionId
-                            }
-                        }
-                    )
-                    .then(function (data) {
-                        console.log(data);
-                    })
-                    .catch(function (error) { // 请求失败处理
-                        console.log(error);
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    console.log(row);
+//                    let fid=row.fid;
+                    this.dictDelete(row._id);
+//                    this.queryDictForPageChSon(fid);
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
                     });
+                });
 
             },
             adduser() {
@@ -138,21 +130,21 @@
                     console.log(tableId);
                     console.log(tableName);
                     //修改请求
-//                    axios
-//                        .post(
-//                            'http://127.0.0.1:7001/sys/dict/update',
-//                            {
-//                                id: tableId,
-//                                name: tableName
-//                            }
-//                        )
-//                        .then(function (data) {
-//                            console.log(data);
-//                        })
-//                        .catch(function (error) { // 请求失败处理
-//                            console.log(error);
-//                        });
-                    this.dictInsert(tableName, tableId);
+                    axios
+                        .post(
+                            'http://127.0.0.1:7001/sys/dict/update',
+                            {
+                                id: tableId,
+                                name: tableName
+                            }
+                        )
+                        .then(function (data) {
+                            console.log(data);
+                        })
+                        .catch(function (error) { // 请求失败处理
+                            console.log(error);
+                        });
+                    this.queryDictForPageChSon(this.form.fid);
                     this.update = false;
                 }
                 else {
@@ -175,8 +167,9 @@
                     console.log('我是id', this.form_id);
                     let name = this.form.name;
                     this.dictInsert(name, fid);
+                    this.queryDictForPageChSon(fid);
                 }
-                this.loadData();
+//                this.queryDictForPage();
                 this.dialogFormVisible = false
             },
 //             查询
@@ -192,38 +185,26 @@
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
                 console.log(this.currentPage) //点击第几页
-                this.loadData();
+                this.queryDictForPage();
             },
             //首页
             userfrist() {
                 this.currentPage = 1;
-                this.loadData()
+                this.queryDictForPage()
             },
             //尾页
             userlast() {
                 this.currentPage = (this.total / this.pagesize);
-                this.loadData()
+                this.queryDictForPage()
             },
             //查看下一级
             handleEnd(index, row) {
                 //把id存起来
                 this.id = this.list[index]._id;
-//                console.log(this.form._id);
-//                console.log(row._id);
-                axios
-                    .get(
-                        'http://127.0.0.1:7001/sys/dict/list?fid=' + row._id + ''
-                    )
-                    .then(response => {
-                            this.list = response.data.data;
-                        }
-                    )
-                    .catch(function (error) { // 请求失败处理
-                        console.log(error);
-                    });
+                this.queryDictForPageChSon(row._id);
             },
             //分页查询数据
-            async loadData() {
+            async queryDictForPage() {
                 try {
                     let result = await queryDictForPage({fid: 0, page: this.currentPage, rows: this.pagesize}, "GET");
                     if (result.code == 0) {
@@ -241,7 +222,26 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
             },
-            //增加
+            async queryDictForPageChSon(fid) {
+                try {
+                    if(!fid){fid=0};
+                    let result = await queryDictForPage({fid: fid, page: this.currentPage, rows: this.pagesize}, "GET");
+                    if (result.code == 0) {
+                        console.log(result.data.list);
+                        this.list = result.data.list;
+                        this.total = result.data.count;
+                        console.log(result.data.count);
+                        this.$message.success('获取列表成功')
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //字典增加
             async dictInsert(name, fid) {
                 try {
                     let result = await dictInsert({name: name, fid: fid}, "POST");
@@ -256,19 +256,33 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
 
+            },
+            //字典删除
+            async dictDelete(id){
+                try {
+                    let result = await dictDelete({id:id}, "GET");
+                    if (result.code == 0) {
+                        this.$message.success('删除成功')
+                    }
+                    else {
+                        this.$message.error('删除失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+
             }
 
         },
         mounted() {
-            this.loadData();
+//            this.queryDictForPage();
+            this.queryDictForPageChSon();
         },
     }
 </script>
 <style>
     .el-main {
-        /*height:1000px;*/
-        /*width: 1000px;*/
-        /*border: 1px red solid;*/
     }
 
     .el-main button {
