@@ -9,7 +9,12 @@
                     <el-col :span="16" style="height: 100%">
                     </el-col>
                     <el-col :span="3" style="height: 100%">
-                        <p>欢迎你:{{name}}</p>
+                        <el-dropdown style="margin-top: 10%!important; margin-right: 30%!important">
+                            <span class="el-dropdown-link">欢迎你:{{name}}</span>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item ><span @click="out">退出登录</span></el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                     </el-col>
                 </div>
             </el-row>
@@ -19,21 +24,19 @@
                 <el-col :span="6">
                     <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
                 </el-col>
-                <!--<div class="tworight">-->
                 <el-col :span="18">
                     <router-view></router-view>
                 </el-col>
-
-                <!--</div>-->
             </el-row>
         </el-main>
     </div>
 </template>
 
 <script>
-    import storageUtil from  '../util/storageUtil'
-    export default {
+    import storageUtil from '../util/storageUtil'
+    import {userLogout} from '../api'
 
+    export default {
         name: 'HelloWorld',
         data() {
             return {
@@ -96,7 +99,7 @@
                     children: 'children',
                     label: 'label'
                 },
-                name:'',
+                name: '',
             };
         },
         methods: {
@@ -108,18 +111,36 @@
                         id: data.id
                     }
                 });
-
             },
             getRouterData() {
                 this.name = this.$route.params.name;
-
+            },
+            //退出
+            out() {
+                this.userLogout();
+                console.log(123);
+            },
+            //退出登录
+            async userLogout() {
+                try {
+                    let result = await userLogout("GET");
+                    if (result.code == 0) {
+//                        this.app.redis.del(sessionId);
+                        this.$message.success('退出成功');
+                        this.$router.replace("/");
+                    }
+                    else {
+                        this.$message.error('退出失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
             }
-
         },
-        mounted(){
-          this.name=storageUtil.read('loginName');
-        }
-
+        mounted() {
+            this.name = storageUtil.read('loginName');
+        },
     };
 </script>
 <style>
@@ -130,27 +151,12 @@
         padding: 0px;
     }
 
-    img {
-        /*width: 100px;*/
-        /*height: 100px;*/
-        /*float: left;*/
-        /*height: 100%;*/
-        /*width: 100px;*/
-        /*height: 200px;*/
+    .el-dropdown-link {
+        font-size: 18px;
+        color: antiquewhite;
+        /*margin-top: 30px!important;*/
+        /*margin-right: 100px!important;*/
     }
-
-    /*.tworight {*/
-    /*position: absolute;*/
-    /*top: 60px;*/
-    /*left: 140px;*/
-
-    /*}*/
-
-    /*.top p {*/
-    /*color: antiquewhite;*/
-    /*text-align: center;*/
-    /*line-height: 60px;*/
-    /*}*/
 
     img {
         width: 100px;

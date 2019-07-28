@@ -20,12 +20,12 @@
         </div>
     </div>
 </template>
-
 <script>
     import ElFormItem from "../../node_modules/element-ui/packages/form/src/form-item.vue";
     import axios from 'axios'
     import {userLogin} from '../api'
-    import storageUtil from  '../util/storageUtil'
+    import storageUtil from '../util/storageUtil'
+
     export default {
         components: {ElFormItem},
         name: 'login',
@@ -47,13 +47,11 @@
                 callback();
             };
             return {
-                sessionId:'',
-                username:'',
+                sessionId: '',
+                username: '',
                 ruleForm2: {
                     pass: '',
                     username: '',
-
-
                 },
                 rules2: {
                     username: [
@@ -64,59 +62,33 @@
                     ],
                 }
             };
-
         },
         methods: {
-            async login(){
+            //用户登录
+            async login() {
                 try {
-                let result = await userLogin({loginName:this.ruleForm2.username,loginPwd:this.ruleForm2.pass},'GET');
-                if(result.code == "0"){
-                    storageUtil.save("sessionId",result.data);
-                    storageUtil.save("loginName",this.ruleForm2.username);
-//                     storageUtil.read('loginName');
-
-                    this.$router.replace("/hello");
-                }else {
-                    this.$message.error('登录失败,请核对账号和密码');
-                }
-                }catch (e){
+                    let result = await userLogin({
+                        loginName: this.ruleForm2.username,
+                        loginPwd: this.ruleForm2.pass
+                    }, 'GET');
+                    if (result.code == "0") {
+                        console.log(result);
+                        storageUtil.save("sessionId", result.data);
+                        storageUtil.save("loginName", this.ruleForm2.username);
+                        this.$router.replace("/hello");
+                    } else {
+                        this.$message.error('登录失败,请核对账号和密码');
+                    }
+                } catch (e) {
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-
             },
+            //登录
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.login();
-//                        axios
-//                            .get(
-//                                'http://127.0.0.1:7001/sys/login/in?loginName='+this.ruleForm2.username+'&&loginPwd='+this.ruleForm2.pass
-//                            )
-//                            .then(response => {
-//                                //打印sessionId
-//                                console.log("sessionId    "+response.data.data);
-//                                //将得到的数据赋值给sessionId
-//                                (this.sessionId=response.data.data);
-//                                //sessionId存在vuex
-//                                this.$store.commit("getSessionId", this.sessionId);
-//                                this.username=this.ruleForm2.username;
-//                                //username存在vuex
-//                                this.$store.commit('changeUsername',this.username);
-//                            })
-//                            .catch(function (error) { // 请求失败处理
-//                                console.log(error);
-//                            });
-//
-//                          this.$router.push({
-//                            name: `HelloWorld`,
-//                            params: {
-//                                name: this.ruleForm2.username
-//                            }
-//                        })
-//                        this.$store.commit('getSessionId',this.sessionId);
-
-                        alert('submit!');
                     } else {
                         console.log('error submit!!');
                         return false;

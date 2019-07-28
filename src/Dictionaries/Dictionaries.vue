@@ -1,7 +1,8 @@
 <template>
     <div class="el-main">
         <el-row>
-            <p>基本服务>字典管理</p>
+            <li>基础服务</li>
+            <li v-for="(tops,index) in toplist" @click="topclick(index)">>{{tops.name}}</li>
         </el-row>
         <el-table :data="list">
             <el-table-column
@@ -11,7 +12,7 @@
             </el-table-column>
             <el-table-column
                     prop="name"
-                    label="登录名"
+                    label="编辑字典[项]名称"
                     sortable>
             </el-table-column>
             <el-table-column label="操作">
@@ -24,7 +25,6 @@
                                @click="handleDelete(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>
-            <!--</el-col>-->
         </el-table>
         <el-button type="primary" size="medium" @click="adduser">新增</el-button>
         <el-button @click="userfrist">首页</el-button>
@@ -58,6 +58,9 @@
     import {queryDictForPage} from '../api'
     import {dictInsert} from '../api'
     import {dictDelete} from '../api'
+    import {queryDictOne} from '../api'
+    import {dictUpdate} from '../api'
+
     export default {
         components: {
             ElCol,
@@ -77,161 +80,121 @@
                     fid: '',
                     _id: ''
                 },
+                toplist: [{
+                    fid: '0',
+                    name: '字典管理'
+                }
+                ],
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
-                gdlist: [],
                 total: 1000,//默认数据总数
                 pagesize: 10,//每页的数据条数
                 currentPage: 1,//默认开始页面
                 id: '',
+                fid: 0,
             }
         },
         methods: {
-//            回填
+            //导航条点击事件
+            topclick(index) {
+                let fid = this.toplist[index].fid;
+                this.queryDictForPageChSon(fid, this.currentPage, this.pagesize);
+                let unmber = this.toplist.length - index;
+                this.toplist.splice(index + 1, unmber);
+            },
+            //回填
             handleEdit(index, row) {
                 this.index = index;
                 this.dialogFormVisible = true;
-                let form = row;
-                this.form = form;
+                console.log(row._id);
+                this.form = row;
+                //中断form和list集合的联动，list重新获取一下数据
+                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                 this.update = true;
             },
             //删除
             handleDelete(index, row) {
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    console.log(row);
-//                    let fid=row.fid;
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示',
+                    {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
                     this.dictDelete(row._id);
-//                    this.queryDictForPageChSon(fid);
                 }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
                 });
-
             },
             adduser() {
                 //清空字典名称
                 this.form.name = "";
                 this.dialogFormVisible = true;
             },
-//            修改和增加
+            //修改和增加
             add() {
+                //true是修改
                 if (this.update) {
-                    console.log("当前", this.index);
                     let tableName = this.form.name;
                     let tableId = this.form._id;
-                    console.log(tableId);
-                    console.log(tableName);
-                    //修改请求
-                    axios
-                        .post(
-                            'http://127.0.0.1:7001/sys/dict/update',
-                            {
-                                id: tableId,
-                                name: tableName
-                            }
-                        )
-                        .then(function (data) {
-                            console.log(data);
-                        })
-                        .catch(function (error) { // 请求失败处理
-                            console.log(error);
-                        });
-                    this.queryDictForPageChSon(this.form.fid);
+                    this.dictUpdate(tableId, tableName);
+                    this.queryDictForPageChSon(this.form.fid, this.currentPage, this.pagesize);
                     this.update = false;
                 }
+                //false是添加
                 else {
-                    console.log(this.form._id);
-                    var fid = this.id;
-                    //判断fid是为空还是为零
-                    //为空代表没有添加过，属于父级添加
-                    //为零代表代表添加过，属于子级添加
+                    let fid = this.id;
+                    //判断fid是为空
+                    //初始值为空代表父级
+                    //有值的话代表的是子级
                     if (fid == "") {
                         fid = 0;
                     }
-                    else if (fid == 0) {
-                        fid = this.form._id;
-
-                        console.log(123);
-                        console.log(this.form._id);
-                        console.log('我是fid', fid);
-                    }
-                    console.log('我是fid', fid);
-                    console.log('我是id', this.form_id);
                     let name = this.form.name;
                     this.dictInsert(name, fid);
-                    this.queryDictForPageChSon(fid);
+                    this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
+
                 }
-//                this.queryDictForPage();
                 this.dialogFormVisible = false
             },
-//             查询
+            //查询
             selectuser() {
-            },
-            filterHandle(value, row) {
-                return this.input === row.name;
             },
             handleSizeChange: function (size) {
                 this.pagesize = size;
-                console.log(this.pagesize) //每页下拉显示数据
+                console.log('我是下拉的数据', this.pagesize);//每页下拉显示数据
             },
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
-                console.log(this.currentPage) //点击第几页
-                this.queryDictForPage();
+                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
             },
             //首页
             userfrist() {
                 this.currentPage = 1;
-                this.queryDictForPage()
+                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
             },
             //尾页
             userlast() {
-                this.currentPage = (this.total / this.pagesize);
-                this.queryDictForPage()
+                //向上取整，因为有时候会有小数
+                this.currentPage = Math.ceil(this.total / this.pagesize);
+                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
             },
             //查看下一级
             handleEnd(index, row) {
+                //把id和name放进toplist 导航条根据name显示，数据根据fid查询 下一级的fid等于上一级的id
+                this.toplist.push({fid: row._id, name: row.name});
+                this.fid = row._id;
                 //把id存起来
                 this.id = this.list[index]._id;
-                this.queryDictForPageChSon(row._id);
+                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
             },
             //分页查询数据
-            async queryDictForPage() {
+            async queryDictForPageChSon(fid, page, rows) {
                 try {
-                    let result = await queryDictForPage({fid: 0, page: this.currentPage, rows: this.pagesize}, "GET");
+                    let result = await queryDictForPage({fid: fid, page: page, rows: rows}, "GET");
                     if (result.code == 0) {
-                        console.log(result.data.list);
                         this.list = result.data.list;
                         this.total = result.data.count;
-                        console.log(result.data.count);
-                        this.$message.success('获取列表成功')
-                    }
-                    else {
-                        this.$message.error('获取列表失败');
-                    }
-                } catch (e) {
-                    alert(e.message);
-                    this.$message.error('系统异常，请联系管理员');
-                }
-            },
-            async queryDictForPageChSon(fid) {
-                try {
-                    if(!fid){fid=0};
-                    let result = await queryDictForPage({fid: fid, page: this.currentPage, rows: this.pagesize}, "GET");
-                    if (result.code == 0) {
-                        console.log(result.data.list);
-                        this.list = result.data.list;
-                        this.total = result.data.count;
-                        console.log(result.data.count);
-                        this.$message.success('获取列表成功')
                     }
                     else {
                         this.$message.error('获取列表失败');
@@ -246,7 +209,7 @@
                 try {
                     let result = await dictInsert({name: name, fid: fid}, "POST");
                     if (result.code == 0) {
-                        this.$message.success('添加成功')
+                        this.$message.success('添加成功');
                     }
                     else {
                         this.$message.error('添加失败');
@@ -255,14 +218,17 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-
             },
             //字典删除
-            async dictDelete(id){
+            async dictDelete(id) {
                 try {
-                    let result = await dictDelete({id:id}, "GET");
+                    let result = await dictDelete({id: id}, "GET");
+                    console.log(result);
+                    this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                     if (result.code == 0) {
-                        this.$message.success('删除成功')
+                        if (result.data.status === -1) {
+                            this.$message.error('字典还有对应的字典项无法删除');
+                        }
                     }
                     else {
                         this.$message.error('删除失败');
@@ -272,12 +238,48 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
 
+            },
+            //字典单条查询
+            async queryDictOne(id) {
+                try {
+                    let result = await queryDictOne({id: id}, "GET");
+                    if (result.code == 0) {
+                        this.$message.success('回填成功')
+                        console.log(result);
+                        console.log(123);
+                    }
+                    else {
+                        this.$message.error('回填失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+
+            },
+            //字典修改
+            async dictUpdate(id, name) {
+                try {
+                    let result = await dictUpdate({id: id, name: name}, "POST");
+                    if (result.code == 0) {
+                        this.$message.success('修改成功')
+                        console.log(result);
+                        console.log(123);
+                    }
+                    else {
+                        this.$message.error('修改失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+
             }
 
         },
+        //在渲染成html后调用 获取字典数据
         mounted() {
-//            this.queryDictForPage();
-            this.queryDictForPageChSon();
+            this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
         },
     }
 </script>
@@ -292,6 +294,10 @@
     em {
         font-style: normal;
         margin-right: 10px;
+    }
+
+    li {
+        display: inline-grid;
     }
 
     /*.el-table td,el-table th{*/

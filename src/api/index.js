@@ -125,17 +125,17 @@ export const dictUpdate = (params, requestMethod) => ajax(`${BASE_URL}/sys/dict/
 export const dictDelete = (params, requestMethod) => ajax(`${BASE_URL}/sys/dict/delete`, params, requestMethod);
 
 /**
- * 21.部门分页查询
+ * 21.地区分页查询
  */
 export const queryDeptForPage = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/listForPage`, params, requestMethod);
 
 /**
- * 22.部门单条查询
+ * 22.地区单条查询
  */
 export const queryDeptOne = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/one`, params, requestMethod);
 
 /**
- * 23.部门信息添加
+ * 23.地区信息添加
  */
 export const deptInsert = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/add`, params, requestMethod);
 
@@ -145,12 +145,12 @@ export const deptInsert = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/
 export const deptUpdate = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/update`, params, requestMethod);
 
 /**
- * 25.部门信息删除
+ * 25.地区信息删除
  */
 export const deptDelete = (params, requestMethod) => ajax(`${BASE_URL}/sys/dept/delete`, params, requestMethod);
 
 /**
- * 26.部门列表
+ * 26.地区列表
  */
 export const queryDeptList = () => ajax(`${BASE_URL}/sys/dept/list`, {}, 'GET');
 

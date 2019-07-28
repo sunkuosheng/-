@@ -26,7 +26,7 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="info" title="重置信息" icon="el-icon-setting"
+                    <el-button size="mini" type="info" title="重置密码" icon="el-icon-setting"
                                @click="handleEdit(scope.$index, scope.row)"></el-button>
                     <el-button size="mini" icon="el-icon-delete" title="删除信息" type="danger"
                                @click="handleDelete(scope.$index, scope.row)"></el-button>
@@ -55,7 +55,6 @@
     import {userDelete} from '../api'
     import {setPassword} from '../api'
 
-
     export default {
         components: {
             ElCol,
@@ -73,28 +72,23 @@
                     address: '',
                     role: '',
                     openID: '',
-
                 },
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
-                gdlist: [],
-//                total:1000,//默认数据总数
-                pagesize: 1,//每页的数据条数
-                currentPage: 1,//默认开始页面
-                id: '',
-//                total:this.list.length
+                pagesize: 2,
+                currentPage:1,
+                total:100
             }
         },
         methods: {
-            selectuser(){
+            selectuser() {
                 this.queryUserForPage(this.input);
             },
-            async setPassword(id){
+            async setPassword(id) {
                 try {
                     let result = await setPassword({id: id}, "GET");
-
                     if (result.code == 0) {
                         this.$message.success('重置密码成功成功');
                     }
@@ -109,9 +103,7 @@
             async delData(id) {
                 try {
                     let result = await userDelete({id: id}, "GET");
-
                     if (result.code == 0) {
-
                         this.$message.success('删除成功');
                         this.queryUserForPage(this.input);
                     }
@@ -130,8 +122,6 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-
-                    console.log('123');
                     this.delData(row._id);
                 }).catch(() => {
                     this.$message({
@@ -141,7 +131,7 @@
                 });
             },
             //重置密码
-            handleEdit(index,row){
+            handleEdit(index, row) {
                 this.setPassword(row._id);
             },
             //用户查询
@@ -169,9 +159,7 @@
             },
             filterHandle(value, row) {
                 return this.input === row.name;
-
-            }
-            ,
+            },
             handleSizeChange: function (size) {
                 this.pagesize = size;
                 console.log(this.pagesize) //每页下拉显示数据
@@ -179,41 +167,23 @@
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
                 console.log(this.currentPage) //点击第几页
-            }
-            ,
+            },
             //首页
             userfrist() {
                 this.currentPage = 1;
-            }
-            ,
+            },
             //尾页
             userlast() {
                 this.currentPage = (this.list.length / 2);
-            }
+            },
         },
-        watch: {
-            list(newV, oldV) {
-                console.log('我是新的');
-                console.log(newV);
-                console.log('我是老的');
-                console.log(oldV);
-            }
-            ,
-        }
-        ,
         mounted() {
-//            this.total = this.list.length;
             this.queryUserForPage(this.input);
-        },
-        //请求数据
-        created() {
-
         },
     }
 </script>
 <style>
     .el-main {
-
     }
 
     .el-main button {
@@ -224,6 +194,4 @@
         font-style: normal;
         margin-right: 10px;
     }
-
-
 </style>
