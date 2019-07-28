@@ -6,13 +6,13 @@
                     <el-col :span="5" style="height: 100%">
                         <img src="../image/70319f7290452f66e9cc7d236f5133d.png" style="height: 100%;width: 100%"/>
                     </el-col>
-                    <el-col :span="16" style="height: 100%">
+                    <el-col :span="12" style="height: 100%">
                     </el-col>
-                    <el-col :span="3" style="height: 100%">
-                        <el-dropdown style="margin-top: 10%!important; margin-right: 30%!important">
-                            <span class="el-dropdown-link">欢迎你:{{name}}</span>
+                    <el-col :span="7" style="height: 100%">
+                        <el-dropdown style="margin-top: 5%!important; margin-right: 30%!important">
+                            <span class="el-dropdown-link" style="display: inline-block">欢迎你:{{name}}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{deptname}}</span>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item ><span @click="out">退出登录</span></el-dropdown-item>
+                                <el-dropdown-item><span @click="out">退出登录</span></el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
                     </el-col>
@@ -100,6 +100,7 @@
                     label: 'label'
                 },
                 name: '',
+                deptname: '',
             };
         },
         methods: {
@@ -125,7 +126,8 @@
                 try {
                     let result = await userLogout("GET");
                     if (result.code == 0) {
-//                        this.app.redis.del(sessionId);
+                        //    清除本地sessionId
+                        storageUtil.save("sessionId", "");
                         this.$message.success('退出成功');
                         this.$router.replace("/");
                     }
@@ -140,6 +142,7 @@
         },
         mounted() {
             this.name = storageUtil.read('loginName');
+            this.deptname = storageUtil.read('deptName');
         },
     };
 </script>

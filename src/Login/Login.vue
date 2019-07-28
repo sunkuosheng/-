@@ -25,6 +25,7 @@
     import axios from 'axios'
     import {userLogin} from '../api'
     import storageUtil from '../util/storageUtil'
+    import {queryUser} from '../api'
 
     export default {
         components: {ElFormItem},
@@ -47,6 +48,7 @@
                 callback();
             };
             return {
+                deptname: '',
                 sessionId: '',
                 username: '',
                 ruleForm2: {
@@ -72,12 +74,29 @@
                         loginPwd: this.ruleForm2.pass
                     }, 'GET');
                     if (result.code == "0") {
-                        console.log(result);
+                        this.queryUser(this.ruleForm2.username);
                         storageUtil.save("sessionId", result.data);
                         storageUtil.save("loginName", this.ruleForm2.username);
                         this.$router.replace("/hello");
                     } else {
                         this.$message.error('登录失败,请核对账号和密码');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //查询用户的省份 根据用户名
+            async queryUser(admin) {
+                try {
+                    let result = await queryUser({loginName: admin}, 'GET');
+                    if (result.code == "0") {
+                        console.log(result.data[0].dept.name);
+                        this.deptname = result.data[0].dept.name;
+                        storageUtil.save("deptName", this.deptname);
+                        console.log('我是', this.deptname);
+                    } else {
+                        this.$message.error('查询用户失败');
                     }
                 } catch (e) {
                     alert(e.message);
@@ -101,7 +120,6 @@
         }
     }
 </script>
-
 <style scoped>
     .login {
         margin: 100px auto;

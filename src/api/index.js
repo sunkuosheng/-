@@ -178,6 +178,7 @@ export const userDelete = (params, requestMethod) => ajax(`${BASE_URL}/sys/user/
  * 30.用户信息单条查询
  */
 export const queryUserOne = (params, requestMethod) => ajax(`${BASE_URL}/sys/user/one`, params, requestMethod);
+export const queryUser = (params, requestMethod) => ajax(`${BASE_URL}/sys/user/list`, params, requestMethod);
 
 /**
  * 31.批量添加用户
