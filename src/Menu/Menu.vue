@@ -25,16 +25,23 @@
                     sortable>
             </el-table-column>
         </el-table>
-        <el-button @click="userfrist">首页</el-button>
-        <el-pagination
+        <!--<el-button @click="userfrist">首页</el-button>-->
+        <!--<el-pagination-->
+                <!--style="display: inline-block"-->
+                <!--@size-change="handleSizeChange"-->
+                <!--@current-change="handleCurrentChange"-->
+                <!--:page-size=pagesize-->
+                <!--layout="prev, pager, next,jumper"-->
+                <!--:total=total>-->
+        <!--</el-pagination>-->
+        <!--<el-button @click="userlast">尾页</el-button>-->
+        <pages
                 style="display: inline-block"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :page-size=pagesize
-                layout="prev, pager, next,jumper"
-                :total=total>
-        </el-pagination>
-        <el-button @click="userlast">尾页</el-button>
+                :total=total
+                :currentPage=currentPage
+                :pageSize=pagesize
+                @handleCurrentChangeSub="handleCurrentChange">
+        </pages>
     </div>
 </template>
 <script>
@@ -43,7 +50,6 @@
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
     import {queryMenuForPage} from '../api'
-
     export default {
         components: {
             ElCol,
@@ -62,7 +68,7 @@
             }
         },
         methods: {
-//            查询
+       //查询
             selectuser() {
                 console.log(this.input);
                 this.currentPage = 1;
@@ -103,7 +109,6 @@
                         this.list = result.data.list;
                         this.total = result.data.count;
                         console.log(result.data.count);
-                        this.$message.success('获取列表成功');
                     }
                     else {
                         this.$message.error('获取列表失败');

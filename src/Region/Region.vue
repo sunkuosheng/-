@@ -27,16 +27,23 @@
             </el-table-column>
         </el-table>
         <el-button type="primary" size="medium" @click="adduser">新增</el-button>
-        <el-button @click="userfrist">首页</el-button>
-        <el-pagination
+        <!--<el-button @click="userfrist">首页</el-button>-->
+        <!--<el-pagination-->
+                <!--style="display: inline-block"-->
+                <!--@size-change="handleSizeChange"-->
+                <!--@current-change="handleCurrentChange"-->
+                <!--:page-size=pagesize-->
+                <!--layout="prev, pager, next,jumper"-->
+                <!--:total=total>-->
+        <!--</el-pagination>-->
+        <!--<el-button @click="userlast">尾页</el-button>-->
+        <pages
                 style="display: inline-block"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :page-size=pagesize
-                layout="prev, pager, next,jumper"
-                :total=total>
-        </el-pagination>
-        <el-button @click="userlast">尾页</el-button>
+                :total=total
+                :currentPage=currentPage
+                :pageSize=pagesize
+                @handleCurrentChangeSub="handleCurrentChange">
+        </pages>
         <el-dialog title="创建地区" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="地区名称" :label-width="formLabelWidth">
@@ -100,6 +107,7 @@
             //导航条点击事件
             topclick(index) {
                 let fid = this.toplist[index].fid;
+                this.fid=fid;
                 this.queryDeptForPage(fid, this.currentPage, this.pagesize);
                 let unmber = this.toplist.length - index;
                 this.toplist.splice(index + 1, unmber);
@@ -116,7 +124,7 @@
             },
             //删除
             handleDelete(index, row) {
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示',
+                this.$confirm('确定要删除该记录吗?', '提示',
                     {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -223,11 +231,13 @@
             async deptDelete(id) {
                 try {
                     let result = await deptDelete({id: id}, "GET");
-                    console.log(result);
                     this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
                     if (result.code == 0) {
                         if (result.data.status === -1) {
                             this.$message.error('地区还有对应的地区，无法删除');
+                        }
+                        else {
+                             console.log(4444);
                         }
                     }
                     else {

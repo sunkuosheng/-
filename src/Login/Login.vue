@@ -91,10 +91,8 @@
                 try {
                     let result = await queryUser({loginName: admin}, 'GET');
                     if (result.code == "0") {
-                        console.log(result.data[0].dept.name);
                         this.deptname = result.data[0].dept.name;
                         storageUtil.save("deptName", this.deptname);
-                        console.log('我是', this.deptname);
                     } else {
                         this.$message.error('查询用户失败');
                     }
@@ -124,12 +122,12 @@
     .login {
         margin: 100px auto;
         width: 350px;
-
         text-align: center;
+        background-image: url("image/4ef7b0258ce5a7f4f4e133d6c2b0814.png");
+        background-size: 100% 100%;
     }
 
     .login img {
-        /*margin-top: 5%;*/
         text-align: center;
         width: 400px;
         height: 200px;

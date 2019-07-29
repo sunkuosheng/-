@@ -118,8 +118,15 @@
             },
             //退出
             out() {
-                this.userLogout();
-                console.log(123);
+                this.$confirm('确定要退出系统吗?', '提示',
+                    {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                    this.userLogout();
+                }).catch(() => {
+                });
             },
             //退出登录
             async userLogout() {
@@ -157,8 +164,6 @@
     .el-dropdown-link {
         font-size: 18px;
         color: antiquewhite;
-        /*margin-top: 30px!important;*/
-        /*margin-right: 100px!important;*/
     }
 
     img {

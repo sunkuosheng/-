@@ -1,7 +1,7 @@
 <template>
     <div class="el-main">
         <el-row>
-            <p>基础服务>菜单管理</p>
+            <p>基础服务>角色权限管理</p>
         </el-row>
         <el-row>
             <em>角色名称</em>
@@ -26,16 +26,31 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-button @click="userfrist">首页</el-button>
-        <el-pagination
+        <!--<el-button @click="userfrist">首页</el-button>-->
+        <!--<el-pagination-->
+                <!--style="display: inline-block"-->
+                <!--@size-change="handleSizeChange"-->
+                <!--@current-change="handleCurrentChange"-->
+                <!--:page-size=pagesize-->
+                <!--layout="prev, pager, next,jumper"-->
+                <!--:total=total>-->
+        <!--</el-pagination>-->
+        <!--<el-button @click="userlast">尾页</el-button>-->
+        <pages
                 style="display: inline-block"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :page-size=pagesize
-                layout="prev, pager, next,jumper"
-                :total=total>
-        </el-pagination>
-        <el-button @click="userlast">尾页</el-button>
+                :total=total
+                :currentPage=currentPage
+                :pageSize=pagesize
+                @handleCurrentChangeSub="handleCurrentChange">
+        </pages>
+        <el-dialog title="设置权限" :visible.sync="dialogTableVisible">
+            //树
+            <el-tree :data="label" :props="defaultProps"></el-tree>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="dialogTableVisible = false">取 消</el-button>
+              <el-button type="primary" @click="dialogTableVisible = false">提 交</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -44,7 +59,7 @@
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
     import {queryRoleForPage} from '../api'
-
+    import {queryMenuForList} from '../api'
     export default {
         components: {
             ElCol,
@@ -60,10 +75,39 @@
                 pagesize: 5,
                 currentPage: 1,
                 id: '',
+                dialogTableVisible: false,
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                },
+                name: '',
+                deptname: '',
+                listTree:'',
+                label:[{
+                }]
             }
         },
         methods: {
-//            查询
+//            loadNode(node, resolve){
+//                if (node.level === 0) {
+//                    //初始第一层节点，初始化数据，根节点配置
+//                    return resolve([{ label: '1' }, { label: '2' }, { label: '3' },]);
+//                }
+//            },
+            //设置权限
+            handleEdit(index, row) {
+                this.queryMenuForList();
+//                console.log(row.roleMenu);
+                this.dialogTableVisible = true;
+                console.log('我是树',this.defaultProps);
+//                for(var i=0;i< this.listTree.length;i++)
+//                {
+//                    console.log(this.listTree[i].name);
+//                    this.label.push({label:this.listTree[i].name});
+
+//                }
+            },
+            // 查询
             selectuser() {
                 console.log(this.input);
                 this.currentPage = 1;
@@ -74,11 +118,9 @@
             },
             handleSizeChange: function (size) {
                 this.pagesize = size;
-                console.log(this.pagesize)
             },
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
-                console.log(this.currentPage)
                 this.queryRoleForPage(this.input);
             },
             //首页
@@ -91,7 +133,7 @@
                 this.currentPage = (this.total / this.pagesize);
                 this.queryRoleForPage(this.input);
             },
-            //菜单查询
+            //角色查询
             async queryRoleForPage(queryName) {
                 try {
                     let result = await queryRoleForPage({
@@ -100,12 +142,8 @@
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
-                        console.log(result.data.list);
+//                        console.log(result.data.list);
                         this.list = result.data.list;
-//                        返回值没有count
-//                        this.total = result.data.count;
-//                        console.log(result.data.count);
-                        this.$message.success('获取列表成功');
                     }
                     else {
                         this.$message.error('获取列表失败');
@@ -114,6 +152,27 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
+            },
+            async queryMenuForList(){
+                try {
+                    let result = await queryMenuForList("GET");
+                    if (result.code == 0) {
+                        for(var i=0;i<result.data.length;i++)
+                        {
+                            if(result.data[i].fid==0)
+                            this.label.push({label:result.data[i].name,children:""})
+                        }
+//                       console.log(result.data);
+//                       this.listTree=result.data;
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+
             },
         },
         mounted() {
@@ -133,9 +192,4 @@
         font-style: normal;
         margin-right: 10px;
     }
-
-    /*.el-table td,el-table th{*/
-    /*text-align: center!important;*/
-    /*}*/
-
 </style>

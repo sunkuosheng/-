@@ -27,16 +27,23 @@
             </el-table-column>
         </el-table>
         <el-button type="primary" size="medium" @click="adduser">新增</el-button>
-        <el-button @click="userfrist">首页</el-button>
-        <el-pagination
-                style="display: inline-block"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :page-size=pagesize
-                layout="prev, pager, next,jumper"
-                :total=total>
-        </el-pagination>
-        <el-button @click="userlast">尾页</el-button>
+        <!--<el-button @click="userfrist">首页</el-button>-->
+        <!--<el-pagination-->
+                <!--style="display: inline-block"-->
+                <!--@size-change="handleSizeChange"-->
+                <!--@current-change="handleCurrentChange"-->
+                <!--:page-size=pagesize-->
+                <!--layout="prev, pager, next,jumper"-->
+                <!--:total=total>-->
+        <!--</el-pagination>-->
+        <!--<el-button @click="userlast">尾页</el-button>-->
+        <pages
+        style="display: inline-block"
+        :total=total
+        :currentPage=currentPage
+        :pageSize=pagesize
+        @handleCurrentChangeSub="handleCurrentChange">
+        </pages>
         <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="字典名称" :label-width="formLabelWidth">
@@ -60,9 +67,11 @@
     import {dictDelete} from '../api'
     import {queryDictOne} from '../api'
     import {dictUpdate} from '../api'
+    import Pages from "../pags/pages.vue";
 
     export default {
         components: {
+            Pages,
             ElCol,
             ElButton,
             ElRow
@@ -82,7 +91,7 @@
                 },
                 toplist:[{
                     fid: '0',
-                    name: '字典管理'
+                    name: '采集人员管理'
                 }
                 ],
                 index: '',

@@ -33,16 +33,23 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-button @click="userfrist">首页</el-button>
-        <el-pagination
+        <!--<el-button @click="userfrist">首页</el-button>-->
+        <!--<el-pagination-->
+                <!--style="display: inline-block"-->
+                <!--@size-change="handleSizeChange"-->
+                <!--@current-change="handleCurrentChange"-->
+                <!--:page-size=pagesize-->
+                <!--layout="prev, pager, next,jumper"-->
+                <!--:total=total>-->
+        <!--</el-pagination>-->
+        <!--<el-button @click="userlast">尾页</el-button>-->
+        <pages
                 style="display: inline-block"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :page-size=pagesize
-                layout="prev, pager, next,jumper"
-                :total=this.list.length>
-        </el-pagination>
-        <el-button @click="userlast">尾页</el-button>
+                :total=total
+                :currentPage=currentPage
+                :pageSize=pagesize
+                @handleCurrentChangeSub="handleCurrentChange">
+        </pages>
     </div>
 </template>
 <script>
@@ -77,14 +84,14 @@
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
-                pagesize: 2,
-                currentPage:1,
-                total:100
+                pagesize: 10,
+                currentPage: 1,
+                total: 100
             }
         },
         methods: {
             selectuser() {
-                this.queryUserForPage(this.input);
+                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
             async setPassword(id) {
                 try {
@@ -135,19 +142,16 @@
                 this.setPassword(row._id);
             },
             //用户查询
-            async queryUserForPage(queryName) {
+            async queryUserForPage(queryName, currentPage, pagesize) {
                 try {
                     let result = await queryUserForPage({
                         queryName: queryName,
-                        page: this.currentPage,
-                        rows: this.pagesize
+                        page: currentPage,
+                        rows: pagesize
                     }, "GET");
                     if (result.code == 0) {
-                        console.log(result.data.list);
                         this.list = result.data.list;
                         this.total = result.data.count;
-                        console.log(result.data.count);
-                        this.$message.success('获取列表成功');
                     }
                     else {
                         this.$message.error('获取列表失败');
@@ -161,24 +165,27 @@
                 return this.input === row.name;
             },
             handleSizeChange: function (size) {
+                //每页下拉显示数据
                 this.pagesize = size;
-                console.log(this.pagesize) //每页下拉显示数据
             },
             handleCurrentChange: function (currentPage) {
+                //点击第几页
                 this.currentPage = currentPage;
-                console.log(this.currentPage) //点击第几页
+                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
             //首页
             userfrist() {
                 this.currentPage = 1;
+                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
             //尾页
             userlast() {
-                this.currentPage = (this.list.length / 2);
+                this.currentPage = Math.ceil(this.total / this.pagesize);
+                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
         },
         mounted() {
-            this.queryUserForPage(this.input);
+            this.queryUserForPage(this.input, this.currentPage, this.pagesize);
         },
     }
 </script>

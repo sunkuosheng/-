@@ -7,6 +7,7 @@ import {routes} from './routes/routes'
 import {store} from './store/store'
 import md5 from './plugins/md5'
 import Vuex from 'vuex'
+import pages from'./pags/pages.vue'
 // Ä¬ÈÏURLÇëÇóÂ·¾¶
 // import axios from 'axios'
 // axios.defaults.baseURL = 'http://127.0.0.1:7001/sys/user/list'
@@ -24,6 +25,7 @@ Vue.use(VueRouter);
 Vue.use(ElementUI);
 Vue.use(md5);
 Vue.use(Vuex);
+Vue.component('pages', pages);
 
 // const routes = [
 //     //µÇÂ¼
