@@ -7,6 +7,7 @@
             <em>用户名</em>
             <el-input placeholder="用户名称" v-model="input" clearable style="width: 200px!important">用户名</el-input>
             <el-button type="primary" size="medium" @click="selectuser">查询</el-button>
+            <el-button type="primary" size="medium" @click="addUser">新增</el-button>
         </el-row>
         <el-table :data="list">
             <el-table-column
@@ -50,6 +51,28 @@
                 :pageSize=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
+        <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+            <el-form :model="form">
+                <el-form-item label="登录名" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" :label-width="formLabelWidth">
+                    <el-input v-model="form.password" autocomplete="off" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="地址" :label-width="formLabelWidth">
+                    <el-input v-model="form.address" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="角色" :label-width="formLabelWidth">
+                    <el-select v-model="form.name" placeholder="请选择角色" >
+                        <el-option v-for="(item,index) in menuList" :key="index" :label="item.name" :value="item.name"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="add">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -61,6 +84,10 @@
     import {queryUserForPage} from '../api'
     import {userDelete} from '../api'
     import {setPassword} from '../api'
+    import {queryRoleForPage} from '../api'
+    import {queryDeptList} from '../api'
+
+
 
     export default {
         components: {
@@ -84,12 +111,24 @@
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
+                menuList:[],
                 pagesize: 10,
                 currentPage: 1,
                 total: 100
             }
         },
         methods: {
+            add(){
+
+            },
+            //新增
+            addUser(){
+                this.dialogFormVisible=true;
+                this.queryRoleForPage();
+                this.queryDeptList();
+
+            },
+            //查询
             selectuser() {
                 this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
@@ -152,6 +191,48 @@
                     if (result.code == 0) {
                         this.list = result.data.list;
                         this.total = result.data.count;
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //权限列表查询 超级管理员 地区管理员
+            async queryRoleForPage() {
+                try {
+                    let result = await queryRoleForPage("GET");
+                    if (result.code == 0) {
+                        for(var i=0;i<result.data.length;i++)
+                        {
+//                            console.log(result[i].name);
+                            this.menuList.push({name:result.data[i].name});
+                        }
+                        console.log(this.menuList);
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //查询地区 省 市
+
+            async queryDeptList() {
+                try {
+                    let result = await queryDeptList("GET");
+                    if (result.code == 0) {
+//                        for(var i=0;i<result.data.length;i++)
+//                        {
+////                            console.log(result[i].name);
+//                            this.menuList.push({name:result.data[i].name});
+//                        }
+//                        console.log(this.menuList);
+                        console.log(result);
                     }
                     else {
                         this.$message.error('获取列表失败');

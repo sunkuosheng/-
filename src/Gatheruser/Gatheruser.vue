@@ -41,7 +41,7 @@
                 :pageSize=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
-        <<el-dialog title="批量添加用户" :visible.sync="dialogFormVisible">
+        <el-dialog title="批量添加用户" :visible.sync="dialogFormVisible">
         <el-form :model="form">
             <el-form-item label="用户数量" :label-width="formLabelWidth">
                 <el-input v-model="form.name" autocomplete="off"></el-input>
