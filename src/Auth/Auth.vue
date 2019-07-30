@@ -26,16 +26,6 @@
                 </template>
             </el-table-column>
         </el-table>
-        <!--<el-button @click="userfrist">首页</el-button>-->
-        <!--<el-pagination-->
-                <!--style="display: inline-block"-->
-                <!--@size-change="handleSizeChange"-->
-                <!--@current-change="handleCurrentChange"-->
-                <!--:page-size=pagesize-->
-                <!--layout="prev, pager, next,jumper"-->
-                <!--:total=total>-->
-        <!--</el-pagination>-->
-        <!--<el-button @click="userlast">尾页</el-button>-->
         <pages
                 style="display: inline-block"
                 :total=total
@@ -44,11 +34,18 @@
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
         <el-dialog title="设置权限" :visible.sync="dialogTableVisible">
-            //树
-            <el-tree :data="label" :props="defaultProps"></el-tree>
+            <el-tree
+                    :data="label"
+                    show-checkbox
+                    node-key="id"
+                    default-expand-all
+                    ref="tree"
+                    :props="defaultProps"
+                    :default-checked-keys="defaultCheckKeys"
+            ></el-tree>
             <span slot="footer" class="dialog-footer">
               <el-button @click="dialogTableVisible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogTableVisible = false">提 交</el-button>
+              <el-button type="primary" @click="primary()">提 交</el-button>
             </span>
         </el-dialog>
     </div>
@@ -60,6 +57,7 @@
     import ElCol from "element-ui/packages/col/src/col";
     import {queryRoleForPage} from '../api'
     import {queryMenuForList} from '../api'
+    import {roleUpdate} from '../api'
     export default {
         components: {
             ElCol,
@@ -68,6 +66,7 @@
         },
         data() {
             return {
+                defaultCheckKeys: ["5d02fc7a2e700a29c027399d"],
                 input: '',
                 index: '',
                 list: [],
@@ -78,38 +77,42 @@
                 dialogTableVisible: false,
                 defaultProps: {
                     children: 'children',
-                    label: 'label'
+                    label: 'name'
                 },
                 name: '',
                 deptname: '',
-                listTree:'',
-                label:[{
-                }]
+                label: [],
+                listType: []
             }
         },
         methods: {
-//            loadNode(node, resolve){
-//                if (node.level === 0) {
-//                    //初始第一层节点，初始化数据，根节点配置
-//                    return resolve([{ label: '1' }, { label: '2' }, { label: '3' },]);
-//                }
-//            },
+            resetChecked() {
+                this.$refs.tree.setCheckedKeys([]);
+            },
+            //提交
+            primary(){
+                var rad='';
+                var ridsa = this.$refs.tree.getCheckedKeys().join(',');// 获取当前的选中的数据[数组] -id, 把数组转换成字符串
+                var ridsb = this.$refs.tree.getCheckedNodes();// 获取当前的选中的数据{对象}
+                ridsb.forEach(ids=>{//获取选中的所有的父级id
+                    rad+=','+ids.pid
+                });
+                let  nodeId=[];
+                for (var i=0;i<ridsb.length;i++)
+                {      let rid=ridsb[i];
+                    nodeId.push({id:rid.id,type:"Checked"});
+                }
+                var jsonStr11 = JSON.stringify(nodeId);//json数组转化成json字符串
+                this.roleUpdate(this.id,jsonStr11);
+                this.dialogTableVisible = false;
+            },
             //设置权限
             handleEdit(index, row) {
-                this.queryMenuForList();
-//                console.log(row.roleMenu);
-                this.dialogTableVisible = true;
-                console.log('我是树',this.defaultProps);
-//                for(var i=0;i< this.listTree.length;i++)
-//                {
-//                    console.log(this.listTree[i].name);
-//                    this.label.push({label:this.listTree[i].name});
-
-//                }
+                this.id=row._id;
+                this.queryMenuForList(index, row);
             },
             // 查询
             selectuser() {
-                console.log(this.input);
                 this.currentPage = 1;
                 this.queryRoleForPage(this.input);
             },
@@ -133,6 +136,25 @@
                 this.currentPage = (this.total / this.pagesize);
                 this.queryRoleForPage(this.input);
             },
+            //角色权限修改
+            async roleUpdate(id,roleMenu) {
+                try {
+                    let result = await roleUpdate({
+                        id:id,
+                        roleMenu:roleMenu
+                    }, "POST");
+                    if (result.code == 0) {
+                        this.queryRoleForPage(this.input);
+                        this.$message.success('修改成功');
+                    }
+                    else {
+                        this.$message.error('获取列表失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
             //角色查询
             async queryRoleForPage(queryName) {
                 try {
@@ -142,7 +164,7 @@
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
-//                        console.log(result.data.list);
+
                         this.list = result.data.list;
                     }
                     else {
@@ -153,17 +175,74 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
             },
-            async queryMenuForList(){
+            //查询并把数据回显在树上
+            async queryMenuForList(index, row) {
                 try {
+                    this.label = [];
+                    let listTree = [];
                     let result = await queryMenuForList("GET");
                     if (result.code == 0) {
-                        for(var i=0;i<result.data.length;i++)
-                        {
-                            if(result.data[i].fid==0)
-                            this.label.push({label:result.data[i].name,children:""})
+                        for (var i = 0; i < result.data.length; i++) {
+                            listTree.push({
+                                name: result.data[i].name,
+                                id: result.data[i]._id,
+                                fid: result.data[i].fid
+                            });
                         }
-//                       console.log(result.data);
-//                       this.listTree=result.data;
+                        //把JSON字符串转换成对象
+                        let roleList = JSON.parse(row.roleMenu);
+                        let tlist = [];
+                        for (var i = 0; i < roleList.length; i++)  // 遍历角色拥有的菜单
+                        {
+                            for (var j = 0; j < listTree.length; j++)//遍历全部菜单
+                            {
+                                if (roleList[i].id == listTree[j].id) {
+                                    listTree[j].type = roleList[i].type;
+//                                    上面语句的另一种写法
+//                            Vue.set(this.listTree[j],"type",roleList[i].type);
+                                }
+
+                            }
+                        }
+
+                        for (var j = 0; j < listTree.length; j++)//遍历全部菜单
+                        {
+                            let item = listTree[j];
+                            if (listTree[j].fid == '0') {
+                                //添加到finalList里
+                                tlist.push(item);
+                            } else {
+                                //遍历finalList找到fid和finalList里面面元素的id相等的那个对象
+                                for (var k = 0; k < tlist.length; k++) {
+                                    let tItem = tlist[k];
+                                    if (tItem.id == item.fid) {
+                                        //判断是否有子级，有填到父级里面，没有子级为空
+                                        if (tItem.children) {
+                                            tItem.children.push(item);
+
+                                        } else {
+                                            tItem.children = [];
+                                            tItem.children.push(item);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        //把数据放在组件树上
+                        this.label = tlist;
+                        this.dialogTableVisible = true;
+                        //默认选中的另一种方法
+//                        this.defaultCheckKeys = roleList.map((a,b)=>{
+//                            return a.id;
+//                        });
+                        //把id存到tkeyLsit的集合
+                        let tkeyLsit = [];
+                        for (let k = 0; k < roleList.length; k++) {
+                            tkeyLsit.push(roleList[k].id);
+                        }
+                        //返回默认选中的id
+                        this.defaultCheckKeys = tkeyLsit;
                     }
                     else {
                         this.$message.error('获取列表失败');

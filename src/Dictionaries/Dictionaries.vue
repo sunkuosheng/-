@@ -250,7 +250,7 @@
                 try {
                     let result = await queryDictOne({id: id}, "GET");
                     if (result.code == 0) {
-                        this.$message.success('回填成功')
+                        this.$message.success('回填成功');
                     }
                     else {
                         this.$message.error('回填失败');
@@ -265,7 +265,7 @@
                 try {
                     let result = await dictUpdate({id: id, name: name}, "POST");
                     if (result.code == 0) {
-                        this.$message.success('修改成功')
+                        this.$message.success('修改成功');
                     }
                     else {
                         this.$message.error('修改失败');
