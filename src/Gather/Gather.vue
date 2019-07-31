@@ -47,6 +47,7 @@
             <el-table-column
                     prop="status"
                     label="状态"
+                    :formatter="stateFormatter"
                     sortable>
             </el-table-column>
         </el-table>
@@ -112,6 +113,10 @@
                 this.currentPage = currentPage;
                 this.queryInfoForPage(this.currentPage, this.pagesize);
             },
+            //状态显示的变化
+            stateFormatter(row) {
+                return row.status == 1 ? '已完成' : '未完成';
+            },
             //分页查询数据
             async queryInfoForPage(page, rows) {
                 try {
@@ -135,7 +140,6 @@
             mounted() {
                 this.queryInfoForPage(this.currentPage, this.pagesize);
             },
-
     }
 </script>
 <style>

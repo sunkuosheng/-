@@ -6,8 +6,7 @@
                 :current-page="currentPageNum"
                 :page-size="pageSize"
                 layout="slot,prev"
-                :total="total"
-        >
+                :total="total">
             <el-button :disabled="firstPageBtnDisabled" class="first-pager" @click="toFirstPage">首页</el-button>
         </el-pagination>
         <el-pagination
@@ -16,8 +15,7 @@
                 :current-page="currentPageNum"
                 :page-size="pageSize"
                 layout="pager,next,slot,jumper"
-                :total="total"
-        >
+                :total="total">
             <el-button :disabled="lastPageBtnDisabled" class="last-pager" @click="toLastPage">尾页</el-button>
         </el-pagination>
     </div>
@@ -54,7 +52,8 @@
                 this.lastPageNum = Math.ceil(newVal / this.pageSize);
             }
         },
-        created() {},
+        created() {
+        },
         methods: {
             handleCurrentChange(val) {
                 this.firstPageBtnDisabled = val === 1 ? true : false;
@@ -70,9 +69,12 @@
                 this.handleCurrentChange(this.lastPageNum);
             }
         },
-        created() {},
-        mounted() {},
-        destroyed() {}
+        created() {
+        },
+        mounted() {
+        },
+        destroyed() {
+        }
     };
 </script>
 <style>

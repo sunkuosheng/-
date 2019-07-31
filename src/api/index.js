@@ -188,7 +188,8 @@ export const userBatchInsert = (params, requestMethod) => ajax(`${BASE_URL}/sys/
 /**
  * 32.加载登录人的菜单权限
  */
-export const loadLoginerRoleMenus = (params, requestMethod) => ajax(`${BASE_URL}/sys/menu/loginerRoleMenu`, {}, 'GET');
+// export const loadLoginerRoleMenus = (params, requestMethod) => ajax(`${BASE_URL}/sys/menu/loginerRoleMenu`, {}, 'GET');
+export const loadLoginerRoleMenus = (params, requestMethod) => ajax(`${BASE_URL}/sys/menu/loginerRoleMenu`, params,requestMethod);
 
 /**
  * 33.重置密码

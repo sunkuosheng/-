@@ -22,7 +22,7 @@
         <el-main>
             <el-row>
                 <el-col :span="6">
-                    <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+                    <el-tree :data="list" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
                 </el-col>
                 <el-col :span="18">
                     <router-view></router-view>
@@ -31,90 +31,89 @@
         </el-main>
     </div>
 </template>
-
 <script>
     import storageUtil from '../util/storageUtil'
     import {userLogout} from '../api'
+    import {loadLoginerRoleMenus} from '../api'
 
     export default {
         name: 'HelloWorld',
         data() {
             return {
-                data: [
-                    {
-                        id: 1,
-                        label: '基础服务',
-                        children: [
-                            {
-                                id: 2,
-                                label: '用户管理',
-                                path: 'User'
-                            },
-                            {
-                                id: 3,
-                                label: '菜单管理',
-                                path: 'Menu'
-
-                            },
-                            {
-                                id: 4,
-                                label: '角色权限管理',
-                                path: 'Auth'
-                            }
-                            , {
-                                id: 5,
-                                label: '字典管理',
-                                path: 'Dictionaries'
-                            }
-                            , {
-                                id: 6,
-                                label: '地区管理',
-                                path: 'Region'
-                            }
-                        ]
-                    },
-                    {
-                        id: 7,
-                        label: '数据统计',
-                        children: [{
-                            id: 8,
-                            label: '采集数据',
-                            path: 'Gather'
-
-                        }]
-                    },
-                    {
-                        id: 9,
-                        label: '公众号菜单管理',
-                        path: 'Accounts'
-
-                    },
-                    {
-                        id: 10,
-                        label: '采集人员管理',
-                        path: 'Gatheruser',
-                    }
-                ],
                 defaultProps: {
                     children: 'children',
-                    label: 'label'
+                    label: 'name',
                 },
+                list: [],
                 name: '',
                 deptname: '',
             };
         },
         methods: {
-            //路由跳转
+            //路由跳转 根据address字段
             handleNodeClick(data) {
-                this.$router.push({
-                    name: data.path,
-                    params: {
-                        id: data.id
-                    }
-                });
+                this.$router.replace(data.address);
             },
-            getRouterData() {
-                this.name = this.$route.params.name;
+            //登陆人权限请求
+            async loadLoginerRoleMenus(loginName) {
+                try {
+                    let result = await loadLoginerRoleMenus({loginName: loginName}, "GET");
+                    if (result.code == 0) {
+                        console.log('res', result.data.dbMenuArr);
+                        let menuArr = [];
+                        let roleArr = [];
+                        menuArr = result.data.dbMenuArr;
+                        roleArr = result.data.roleMenu;
+                        //menuArr获取type数据
+                        for (let i = 0; i < menuArr.length; i++) {
+                            let imeuArr = menuArr[i];
+                            for (let j = 0; j < roleArr.length; j++) {
+                                let jroleArr = roleArr[j];
+                                if (imeuArr._id == jroleArr.id) {
+                                    imeuArr.type = jroleArr.type;
+                                }
+                            }
+                        }
+                        //过滤type不等于Checked
+                        let smenuArr = [];
+                        for (let c = 0; c < menuArr.length; c++) {
+                            let cmenuArr = menuArr[c];
+                            if (cmenuArr.type == 'Checked') {
+                                smenuArr.push(cmenuArr);
+                            }
+                        }
+                        //分出子父级
+                        let winMenu = [];
+                        for (let k = 0; k < smenuArr.length; k++) {
+                            let kMenArr = smenuArr[k];
+                            if (kMenArr.fid == '0') {
+                                winMenu.push(kMenArr);
+                            }
+                            else {
+                                for (let h = 0; h < winMenu.length; h++) {
+                                    let hwinMenu = winMenu[h];
+                                    if (hwinMenu._id == kMenArr.fid) {
+                                        if (hwinMenu.children) {
+                                            hwinMenu.children.push(kMenArr);
+                                        }
+                                        else {
+                                            hwinMenu.children = [];
+                                            hwinMenu.children.push(kMenArr);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        this.list = winMenu;
+                        console.log(winMenu);
+                    }
+                    else {
+                        this.$message.error('获取权限失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
             },
             //退出
             out() {
@@ -128,7 +127,7 @@
                 }).catch(() => {
                 });
             },
-            //退出登录
+            //退出登录请求
             async userLogout() {
                 try {
                     let result = await userLogout("GET");
@@ -147,9 +146,11 @@
                 }
             }
         },
+        //html渲染之后
         mounted() {
             this.name = storageUtil.read('loginName');
             this.deptname = storageUtil.read('deptName');
+            this.loadLoginerRoleMenus(this.name);
         },
     };
 </script>

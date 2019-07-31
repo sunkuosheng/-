@@ -34,16 +34,6 @@
                 </template>
             </el-table-column>
         </el-table>
-        <!--<el-button @click="userfrist">首页</el-button>-->
-        <!--<el-pagination-->
-                <!--style="display: inline-block"-->
-                <!--@size-change="handleSizeChange"-->
-                <!--@current-change="handleCurrentChange"-->
-                <!--:page-size=pagesize-->
-                <!--layout="prev, pager, next,jumper"-->
-                <!--:total=total>-->
-        <!--</el-pagination>-->
-        <!--<el-button @click="userlast">尾页</el-button>-->
         <pages
                 style="display: inline-block"
                 :total=total
@@ -54,17 +44,19 @@
         <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="登录名" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                    <el-input v-model="form.loginName" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" :label-width="formLabelWidth">
                     <el-input v-model="form.password" autocomplete="off" show-password></el-input>
                 </el-form-item>
-                <el-form-item label="地址" :label-width="formLabelWidth">
-                    <el-input v-model="form.address" autocomplete="off"></el-input>
+                <el-form-item label="地区" :label-width="formLabelWidth">
+                    <el-cascader :options="options" :props="defaultProps" v-model="form.address"
+                                 clearable></el-cascader>
                 </el-form-item>
                 <el-form-item label="角色" :label-width="formLabelWidth">
-                    <el-select v-model="form.name" placeholder="请选择角色" >
-                        <el-option v-for="(item,index) in menuList" :key="index" :label="item.name" :value="item.name"></el-option>
+                    <el-select v-model="form.name" placeholder="请选择角色">
+                        <el-option v-for="(item,index) in menuList" :key="index" :label="item.name"
+                                   :value="item._id"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -76,7 +68,6 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
@@ -86,8 +77,7 @@
     import {setPassword} from '../api'
     import {queryRoleForPage} from '../api'
     import {queryDeptList} from '../api'
-
-
+    import {userInsert} from '../api'
 
     export default {
         components: {
@@ -100,52 +90,84 @@
                 input: '',
                 dialogFormVisible: false,
                 form: {
-                    name: '',
+                    loginName: '',
                     password: '',
-                    state: '',
                     address: '',
-                    role: '',
-                    openID: '',
+                    name: '',
                 },
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
                 list: [],
-                menuList:[],
+                menuList: [],
+                options: [],
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                    value: '_id'
+                },
                 pagesize: 10,
                 currentPage: 1,
                 total: 100
             }
         },
         methods: {
-            add(){
-
+            //增加
+            add() {
+                let loginName = this.form.loginName;
+                let loginPwd = this.form.password;
+                let role = this.form.address;
+                let dept = this.form.name;
+                this.userInsert(loginName, loginPwd, role[role.length - 1], dept);
+                this.dialogFormVisible = false;
             },
             //新增
-            addUser(){
-                this.dialogFormVisible=true;
+            addUser() {
+                this.dialogFormVisible = true;
                 this.queryRoleForPage();
                 this.queryDeptList();
 
             },
-            //查询
-            selectuser() {
-                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
-            },
-            async setPassword(id) {
+            //用户添加
+            async userInsert(loginName, loginPwd, role, dept) {
                 try {
-                    let result = await setPassword({id: id}, "GET");
+                    let result = await userInsert({
+                        loginName: loginName,
+                        loginPwd: loginPwd,
+                        role: role,
+                        dept: dept
+                    }, "post");
                     if (result.code == 0) {
-                        this.$message.success('重置密码成功成功');
+                        this.$message.success('用户增加成功');
                     }
                     else {
-                        this.$message.error('删除失败');
+                        this.$message.error('用户增加失败');
                     }
                 } catch (e) {
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
             },
+            //查询
+            selectuser() {
+                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
+            },
+            //重置密码请求
+            async setPassword(id) {
+                try {
+                    let result = await setPassword({id: id}, "GET");
+                    if (result.code == 0) {
+                        this.$message.success('重置密码成功');
+                    }
+                    else {
+                        this.$message.error('重置密码失败');
+                    }
+                } catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+            },
+            //用户删除请求
             async delData(id) {
                 try {
                     let result = await userDelete({id: id}, "GET");
@@ -161,7 +183,7 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
             },
-            //删除
+            //删除操作
             handleDelete(index, row) {
                 this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -205,12 +227,7 @@
                 try {
                     let result = await queryRoleForPage("GET");
                     if (result.code == 0) {
-                        for(var i=0;i<result.data.length;i++)
-                        {
-//                            console.log(result[i].name);
-                            this.menuList.push({name:result.data[i].name});
-                        }
-                        console.log(this.menuList);
+                        this.menuList = result.data;
                     }
                     else {
                         this.$message.error('获取列表失败');
@@ -221,18 +238,33 @@
                 }
             },
             //查询地区 省 市
-
             async queryDeptList() {
                 try {
                     let result = await queryDeptList("GET");
                     if (result.code == 0) {
-//                        for(var i=0;i<result.data.length;i++)
-//                        {
-////                            console.log(result[i].name);
-//                            this.menuList.push({name:result.data[i].name});
-//                        }
-//                        console.log(this.menuList);
-                        console.log(result);
+                        let tlist = [];
+                        //三级联动
+                        for (let j = 0; j < result.data.length; j++) {
+                            let item = result.data[j];
+                            if (!item.fid || item.fid == '0') {
+                                tlist.push(item);
+                            } else {
+                                for (let k = 0; k < result.data.length; k++) {
+                                    let tItem = result.data[k];
+                                    if (tItem._id == item.fid) {
+                                        if (tItem.children) {
+                                            tItem.children.push(item);
+
+                                        } else {
+                                            tItem.children = [];
+                                            tItem.children.push(item);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        this.options = tlist;
                     }
                     else {
                         this.$message.error('获取列表失败');
@@ -245,23 +277,10 @@
             filterHandle(value, row) {
                 return this.input === row.name;
             },
-            handleSizeChange: function (size) {
-                //每页下拉显示数据
-                this.pagesize = size;
-            },
+            //点击页码
             handleCurrentChange: function (currentPage) {
                 //点击第几页
                 this.currentPage = currentPage;
-                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
-            },
-            //首页
-            userfrist() {
-                this.currentPage = 1;
-                this.queryUserForPage(this.input, this.currentPage, this.pagesize);
-            },
-            //尾页
-            userlast() {
-                this.currentPage = Math.ceil(this.total / this.pagesize);
                 this.queryUserForPage(this.input, this.currentPage, this.pagesize);
             },
         },

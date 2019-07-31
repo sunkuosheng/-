@@ -27,16 +27,6 @@
             </el-table-column>
         </el-table>
         <el-button type="primary" size="medium" @click="adduser">新增</el-button>
-        <!--<el-button @click="userfrist">首页</el-button>-->
-        <!--<el-pagination-->
-                <!--style="display: inline-block"-->
-                <!--@size-change="handleSizeChange"-->
-                <!--@current-change="handleCurrentChange"-->
-                <!--:page-size=pagesize-->
-                <!--layout="prev, pager, next,jumper"-->
-                <!--:total=total>-->
-        <!--</el-pagination>-->
-        <!--<el-button @click="userlast">尾页</el-button>-->
         <pages
                 style="display: inline-block"
                 :total=total
@@ -58,7 +48,6 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
@@ -90,8 +79,7 @@
                 toplist: [{
                     fid: '0',
                     name: '地区管理'
-                }
-                ],
+                }],
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
@@ -107,7 +95,7 @@
             //导航条点击事件
             topclick(index) {
                 let fid = this.toplist[index].fid;
-                this.fid=fid;
+                this.fid = fid;
                 this.queryDeptForPage(fid, this.currentPage, this.pagesize);
                 let unmber = this.toplist.length - index;
                 this.toplist.splice(index + 1, unmber);
@@ -116,7 +104,6 @@
             handleEdit(index, row) {
                 this.index = index;
                 this.dialogFormVisible = true;
-                console.log(row._id);
                 this.form = row;
                 //中断form和list集合的联动，list重新获取一下数据
                 this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
@@ -164,13 +151,6 @@
 
                 }
                 this.dialogFormVisible = false
-            },
-            //查询
-            selectuser() {
-            },
-            handleSizeChange: function (size) {
-                this.pagesize = size;
-                console.log('我是下拉的数据', this.pagesize);//每页下拉显示数据
             },
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
@@ -237,7 +217,7 @@
                             this.$message.error('地区还有对应的地区，无法删除');
                         }
                         else {
-                             console.log(4444);
+                            console.log(4444);
                         }
                     }
                     else {
@@ -255,8 +235,6 @@
                     let result = await querydeptOne({id: id}, "GET");
                     if (result.code == 0) {
                         this.$message.success('回填成功')
-                        console.log(result);
-                        console.log(123);
                     }
                     else {
                         this.$message.error('回填失败');
@@ -265,7 +243,6 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-
             },
             //地区修改
             async deptUpdate(id, name) {
@@ -273,8 +250,6 @@
                     let result = await deptUpdate({id: id, name: name}, "POST");
                     if (result.code == 0) {
                         this.$message.success('修改成功')
-                        console.log(result);
-                        console.log(123);
                     }
                     else {
                         this.$message.error('修改失败');
@@ -283,9 +258,7 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-
             }
-
         },
         //在渲染成html后调用 获取地区数据
         mounted() {

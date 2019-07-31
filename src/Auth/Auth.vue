@@ -80,7 +80,7 @@
                     label: 'name'
                 },
                 name: '',
-                deptname: '',
+                deptname:'name',
                 label: [],
                 listType: []
             }

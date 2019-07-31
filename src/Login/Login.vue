@@ -2,8 +2,7 @@
     <div class="login">
         <img src="./image/d33253cf28752ec3b2be854e4043ea5.png"/>
         <div class="from">
-            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px"
-                     class="demo-ruleForm">
+            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px" class="demo-ruleForm">
                 <p>登录用户名密码</p>
                 <el-form-item prop="username">
                     <el-input v-model="ruleForm2.username" placeholder="账号" size="20px" maxlenhth="10"></el-input>
@@ -12,8 +11,7 @@
                     <el-input type="password" v-model="ruleForm2.pass" placeholder="密码"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button size="medium" type="primary" @click="submitForm('ruleForm2')"
-                               style="width: 340px!important;">提交
+                    <el-button size="medium" type="primary" @click="submitForm('ruleForm2')" style="width: 340px!important;">提交
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -22,7 +20,6 @@
 </template>
 <script>
     import ElFormItem from "../../node_modules/element-ui/packages/form/src/form-item.vue";
-    import axios from 'axios'
     import {userLogin} from '../api'
     import storageUtil from '../util/storageUtil'
     import {queryUser} from '../api'
@@ -77,7 +74,7 @@
                         this.queryUser(this.ruleForm2.username);
                         storageUtil.save("sessionId", result.data);
                         storageUtil.save("loginName", this.ruleForm2.username);
-                        this.$router.replace("/hello");
+                        this.$router.replace("/home");
                     } else {
                         this.$message.error('登录失败,请核对账号和密码');
                     }
@@ -86,7 +83,7 @@
                     this.$message.error('系统异常，请联系管理员');
                 }
             },
-            //查询用户的省份 根据用户名
+            //查询用户的省份请求 根据用户名
             async queryUser(admin) {
                 try {
                     let result = await queryUser({loginName: admin}, 'GET');
@@ -111,9 +108,6 @@
                         return false;
                     }
                 });
-            },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
             },
         }
     }

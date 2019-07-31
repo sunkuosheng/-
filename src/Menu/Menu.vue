@@ -25,16 +25,6 @@
                     sortable>
             </el-table-column>
         </el-table>
-        <!--<el-button @click="userfrist">首页</el-button>-->
-        <!--<el-pagination-->
-                <!--style="display: inline-block"-->
-                <!--@size-change="handleSizeChange"-->
-                <!--@current-change="handleCurrentChange"-->
-                <!--:page-size=pagesize-->
-                <!--layout="prev, pager, next,jumper"-->
-                <!--:total=total>-->
-        <!--</el-pagination>-->
-        <!--<el-button @click="userlast">尾页</el-button>-->
         <pages
                 style="display: inline-block"
                 :total=total
@@ -45,14 +35,13 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
     import {queryMenuForPage} from '../api'
+
     export default {
         components: {
-            ElCol,
             ElButton,
             ElRow
         },
@@ -68,7 +57,7 @@
             }
         },
         methods: {
-       //查询
+            //查询
             selectuser() {
                 console.log(this.input);
                 this.currentPage = 1;
@@ -77,13 +66,8 @@
             filterHandle(value, row) {
                 return this.input === row.name;
             },
-            handleSizeChange: function (size) {
-                this.pagesize = size;
-                console.log(this.pagesize)
-            },
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;
-                console.log(this.currentPage)
                 this.queryMenuForPage(this.input);
             },
             //首页
@@ -105,10 +89,8 @@
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
-                        console.log(result.data.list);
                         this.list = result.data.list;
                         this.total = result.data.count;
-                        console.log(result.data.count);
                     }
                     else {
                         this.$message.error('获取列表失败');
