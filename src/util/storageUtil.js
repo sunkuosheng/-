@@ -6,5 +6,12 @@ export default {
   //根据key读取缓存数据
   read (key) {
     return JSON.parse(window.localStorage.getItem(key) || null);
-  }
+  },
+    saveBasic (key, value) {
+        window.localStorage.setItem(key, value+"");
+    },
+    readBasic (key) {
+        return window.localStorage.getItem(key);
+    },
+
 }

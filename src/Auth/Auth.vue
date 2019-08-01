@@ -58,6 +58,7 @@
     import {queryRoleForPage} from '../api'
     import {queryMenuForList} from '../api'
     import {roleUpdate} from '../api'
+
     export default {
         components: {
             ElCol,
@@ -80,7 +81,7 @@
                     label: 'name'
                 },
                 name: '',
-                deptname:'name',
+                deptname: 'name',
                 label: [],
                 listType: []
             }
@@ -90,25 +91,28 @@
                 this.$refs.tree.setCheckedKeys([]);
             },
             //提交
-            primary(){
-                var rad='';
-                var ridsa = this.$refs.tree.getCheckedKeys().join(',');// 获取当前的选中的数据[数组] -id, 把数组转换成字符串
+            primary() {
                 var ridsb = this.$refs.tree.getCheckedNodes();// 获取当前的选中的数据{对象}
-                ridsb.forEach(ids=>{//获取选中的所有的父级id
-                    rad+=','+ids.pid
-                });
-                let  nodeId=[];
-                for (var i=0;i<ridsb.length;i++)
-                {      let rid=ridsb[i];
-                    nodeId.push({id:rid.id,type:"Checked"});
+                var Halfridsb = this.$refs.tree.getHalfCheckedNodes();// 获取当前半选中的数据{对象}
+                console.log("节点", ridsb);
+                let nodeId = [];
+                for (var i = 0; i < ridsb.length; i++) {
+                    let rid = ridsb[i];
+                    nodeId.push({id: rid.id, type: "Checked"});
                 }
+                for (var j = 0; j < Halfridsb.length; j++) {
+                    let rid = Halfridsb[j];
+                    nodeId.push({id: rid.id, type: "HalfChecked"});
+                }
+
                 var jsonStr11 = JSON.stringify(nodeId);//json数组转化成json字符串
-                this.roleUpdate(this.id,jsonStr11);
+                console.log("修改权限树", jsonStr11)
+                this.roleUpdate(this.id, jsonStr11);
                 this.dialogTableVisible = false;
             },
             //设置权限
             handleEdit(index, row) {
-                this.id=row._id;
+                this.id = row._id;
                 this.queryMenuForList(index, row);
             },
             // 查询
@@ -137,11 +141,11 @@
                 this.queryRoleForPage(this.input);
             },
             //角色权限修改
-            async roleUpdate(id,roleMenu) {
+            async roleUpdate(id, roleMenu) {
                 try {
                     let result = await roleUpdate({
-                        id:id,
-                        roleMenu:roleMenu
+                        id: id,
+                        roleMenu: roleMenu
                     }, "POST");
                     if (result.code == 0) {
                         this.queryRoleForPage(this.input);
@@ -180,6 +184,7 @@
                 try {
                     this.label = [];
                     let listTree = [];
+
                     let result = await queryMenuForList("GET");
                     if (result.code == 0) {
                         for (var i = 0; i < result.data.length; i++) {
@@ -190,7 +195,7 @@
                             });
                         }
                         //把JSON字符串转换成对象
-                        let roleList = JSON.parse(row.roleMenu);
+                        let roleList = JSON.parse(row.roleMenu);//
                         let tlist = [];
                         for (var i = 0; i < roleList.length; i++)  // 遍历角色拥有的菜单
                         {
@@ -239,6 +244,7 @@
                         //把id存到tkeyLsit的集合
                         let tkeyLsit = [];
                         for (let k = 0; k < roleList.length; k++) {
+//                            if roleList[k].type === ''checked
                             tkeyLsit.push(roleList[k].id);
                         }
                         //返回默认选中的id

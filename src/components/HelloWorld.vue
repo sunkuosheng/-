@@ -8,13 +8,18 @@
                     </el-col>
                     <el-col :span="12" style="height: 100%">
                     </el-col>
-                    <el-col :span="7" style="height: 100%">
-                        <el-dropdown style="margin-top: 5%!important; margin-right: 30%!important">
-                            <span class="el-dropdown-link" style="display: inline-block">欢迎你:{{name}}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{deptname}}</span>
+                    <el-col :span="3" style="height: 100%;line-height:50px">
+                        <el-dropdown>
+                            <span class="el-dropdown-link" style="display: inline-block">欢迎你:{{name}}</span>
                             <el-dropdown-menu slot="dropdown">
                                 <el-dropdown-item><span @click="out">退出登录</span></el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
+                    </el-col>
+                    <el-col :span="1" style="height: 100%;line-height:50px">
+                    </el-col>
+                    <el-col :span="3" style="height: 100%;line-height:50px">
+                        <span class="el-dropdown-link" style="display: inline-block">{{deptname}}</span>
                     </el-col>
                 </div>
             </el-row>
@@ -35,8 +40,11 @@
     import storageUtil from '../util/storageUtil'
     import {userLogout} from '../api'
     import {loadLoginerRoleMenus} from '../api'
-
+    import {queryDeptList} from '../api'
+    import {queryRoleForPage} from '../api'
+    import ElCol from "element-ui/packages/col/src/col";
     export default {
+        components: {ElCol},
         name: 'HelloWorld',
         data() {
             return {
@@ -47,6 +55,7 @@
                 list: [],
                 name: '',
                 deptname: '',
+                fid:'',
             };
         },
         methods: {
@@ -58,8 +67,8 @@
             async loadLoginerRoleMenus(loginName) {
                 try {
                     let result = await loadLoginerRoleMenus({loginName: loginName}, "GET");
+                    console.log('我是登陆人的请求下来的权限',result);
                     if (result.code == 0) {
-                        console.log('res', result.data.dbMenuArr);
                         let menuArr = [];
                         let roleArr = [];
                         menuArr = result.data.dbMenuArr;
@@ -74,14 +83,15 @@
                                 }
                             }
                         }
-                        //过滤type不等于Checked
+                        //过滤type不等于Checked或者不等于HalfChecked
                         let smenuArr = [];
                         for (let c = 0; c < menuArr.length; c++) {
                             let cmenuArr = menuArr[c];
-                            if (cmenuArr.type == 'Checked') {
+                            if (cmenuArr.type == 'Checked'||cmenuArr.type == 'HalfChecked') {
                                 smenuArr.push(cmenuArr);
                             }
                         }
+                        console.log('我是加了Checked',smenuArr);
                         //分出子父级
                         let winMenu = [];
                         for (let k = 0; k < smenuArr.length; k++) {
@@ -105,7 +115,7 @@
                             }
                         }
                         this.list = winMenu;
-                        console.log(winMenu);
+                        console.log('我是权限',winMenu);
                     }
                     else {
                         this.$message.error('获取权限失败');
@@ -132,8 +142,10 @@
                 try {
                     let result = await userLogout("GET");
                     if (result.code == 0) {
-                        //    清除本地sessionId
-                        storageUtil.save("sessionId", "");
+                        //    清除本地sessionId 用户名 地区
+                        storageUtil.saveBasic("sessionId","");
+                        storageUtil.save("loginName","");
+                        storageUtil.save("deptName","");
                         this.$message.success('退出成功');
                         this.$router.replace("/");
                     }
@@ -144,13 +156,17 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-            }
+            },
         },
         //html渲染之后
         mounted() {
+            //读取登录用户名
             this.name = storageUtil.read('loginName');
+            //读取用户名 最高级地区
             this.deptname = storageUtil.read('deptName');
+            //加载权限
             this.loadLoginerRoleMenus(this.name);
+
         },
     };
 </script>

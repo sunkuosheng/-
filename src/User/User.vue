@@ -254,7 +254,6 @@
                                     if (tItem._id == item.fid) {
                                         if (tItem.children) {
                                             tItem.children.push(item);
-
                                         } else {
                                             tItem.children = [];
                                             tItem.children.push(item);
@@ -262,7 +261,6 @@
                                     }
                                 }
                             }
-
                         }
                         this.options = tlist;
                     }

@@ -19,26 +19,20 @@ const router = new VueRouter({
     mode: 'history',
 })
 router.beforeEach((to,from,next)=>{
-    // console.log(to);
-    // console.log(from);
-    // next();
-    const nextRoute = ['home', 'user', 'menu', 'role', 'dict','dept','info','wxMenu','collectionUser'];
-    let isLogin = global.isLogin;  // ÊÇ·ñµÇÂ¼
-    // Î´µÇÂ¼×´Ì¬£»µ±Â·ÓÉµ½nextRouteÖ¸¶¨Ò³Ê±£¬Ìø×ªÖÁlogin
-    if (nextRoute.indexOf(to.name) >= 0) {
-        if (!isLogin) {
-            console.log('what fuck');
-            routes.push({ name: 'Login' })
-        }
-    }
-    // ÒÑµÇÂ¼×´Ì¬£»µ±Â·ÓÉµ½loginÊ±£¬Ìø×ªÖÁhome
-    if (to.name === 'Login') {
-        if (isLogin) {
-            routes.push({ name: 'home' });
-            console.log('ÒÑ¾­µÇÂ½ÁË');
-        }
-    }
-    next();
+    let isLogin = window.localStorage.getItem("sessionId");
+    console.log(isLogin.length);
+      if(isLogin.length>0||to.name === 'Login')
+      {
+          console.log(123);
+          console.log(isLogin);
+          next();
+      }
+      else
+      {
+         alert('è¯·ç™»å½•!');
+          next('/');
+
+      }
 })
 Vue.config.productionTip = false
 

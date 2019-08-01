@@ -11,6 +11,7 @@ export const userLogin = (params, requestMethod) => ajax(`${BASE_URL}/sys/login/
  * 2.获取用户信息
  */
 export const userInfo = () => ajax(`${BASE_URL}/sys/login/session`, {}, 'GET');
+export const userInfos = (params, requestMethod) => ajax(`${BASE_URL}/sys/login/session`,params, requestMethod);
 
 /**
  * 3.退出系统

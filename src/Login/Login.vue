@@ -2,7 +2,8 @@
     <div class="login">
         <img src="./image/d33253cf28752ec3b2be854e4043ea5.png"/>
         <div class="from">
-            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px" class="demo-ruleForm">
+            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px"
+                     class="demo-ruleForm">
                 <p>登录用户名密码</p>
                 <el-form-item prop="username">
                     <el-input v-model="ruleForm2.username" placeholder="账号" size="20px" maxlenhth="10"></el-input>
@@ -11,7 +12,8 @@
                     <el-input type="password" v-model="ruleForm2.pass" placeholder="密码"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button size="medium" type="primary" @click="submitForm('ruleForm2')" style="width: 340px!important;">提交
+                    <el-button size="medium" type="primary" @click="submitForm('ruleForm2')"
+                               style="width: 340px!important;">提交
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -23,6 +25,8 @@
     import {userLogin} from '../api'
     import storageUtil from '../util/storageUtil'
     import {queryUser} from '../api'
+    import {userInfos} from '../api'
+
 
     export default {
         components: {ElFormItem},
@@ -71,10 +75,10 @@
                         loginPwd: this.ruleForm2.pass
                     }, 'GET');
                     if (result.code == "0") {
-                        this.queryUser(this.ruleForm2.username);
                         storageUtil.save("sessionId", result.data);
                         storageUtil.save("loginName", this.ruleForm2.username);
-                        this.$router.replace("/home");
+                        this.queryUser(this.ruleForm2.username);
+
                     } else {
                         this.$message.error('登录失败,请核对账号和密码');
                     }
@@ -88,8 +92,23 @@
                 try {
                     let result = await queryUser({loginName: admin}, 'GET');
                     if (result.code == "0") {
+                        console.log('我市', result);
                         this.deptname = result.data[0].dept.name;
+                        console.log('我是用户名', this.deptname);
+                        let fid = result.data[0]._id;
+
+                        if (fid == '5d0070438217f92210e6f972') {
+                            storageUtil.save("fid", '0');
+                        }
+                        else {
+                            console.log(456);
+                            fid = result.data[0].dept._id;
+//                            fid = result.data[0].dept.fid;
+
+                            storageUtil.save("fid", fid);
+                        }
                         storageUtil.save("deptName", this.deptname);
+                        this.$router.replace("/home");
                     } else {
                         this.$message.error('查询用户失败');
                     }
@@ -105,10 +124,16 @@
                         this.login();
                     } else {
                         console.log('error submit!!');
+                        this.$router.replace("/home");
                         return false;
                     }
                 });
             },
+        },
+        watch: {
+            deptname(newde, oldde) {
+                this.deptname=newde;
+            }
         }
     }
 </script>

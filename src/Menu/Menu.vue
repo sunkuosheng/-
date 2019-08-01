@@ -89,6 +89,7 @@
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
+                        console.log(result);
                         this.list = result.data.list;
                         this.total = result.data.count;
                     }

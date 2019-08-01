@@ -56,6 +56,7 @@
     import {deptDelete} from '../api'
     import {queryDeptOne} from '../api'
     import {deptUpdate} from '../api'
+    import storageUtil from '../util/storageUtil'
 
     export default {
         components: {
@@ -76,10 +77,7 @@
                     fid: '',
                     _id: ''
                 },
-                toplist: [{
-                    fid: '0',
-                    name: '地区管理'
-                }],
+                toplist: [],
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
@@ -133,7 +131,7 @@
                     let tableName = this.form.name;
                     let tableId = this.form._id;
                     this.deptUpdate(tableId, tableName);
-                    this.queryDeptForPage(this.form.fid, this.currentPage, this.pagesize);
+
                     this.update = false;
                 }
                 //false是添加
@@ -147,7 +145,7 @@
                     }
                     let name = this.form.name;
                     this.deptInsert(name, fid);
-                    this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
+
 
                 }
                 this.dialogFormVisible = false
@@ -197,6 +195,7 @@
                 try {
                     let result = await deptInsert({name: name, fid: fid}, "POST");
                     if (result.code == 0) {
+                        this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
                         this.$message.success('添加成功');
                     }
                     else {
@@ -211,13 +210,17 @@
             async deptDelete(id) {
                 try {
                     let result = await deptDelete({id: id}, "GET");
-                    this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
+
                     if (result.code == 0) {
                         if (result.data.status === -1) {
                             this.$message.error('地区还有对应的地区，无法删除');
                         }
+                        else if (result.data.status === -2){
+                            this.$message.error('地区同等级，无法删除');
+                        }
                         else {
-                            console.log(4444);
+                            this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
+                            this.$message.success('删除成功');
                         }
                     }
                     else {
@@ -249,6 +252,7 @@
                 try {
                     let result = await deptUpdate({id: id, name: name}, "POST");
                     if (result.code == 0) {
+                        this.queryDeptForPage(this.form.fid, this.currentPage, this.pagesize);
                         this.$message.success('修改成功')
                     }
                     else {
@@ -258,11 +262,16 @@
                     alert(e.message);
                     this.$message.error('系统异常，请联系管理员');
                 }
-            }
+            },
+
         },
         //在渲染成html后调用 获取地区数据
         mounted() {
             this.queryDeptForPage(this.fid, this.currentPage, this.pagesize);
+        },
+        created(){
+            this.fid=storageUtil.read('fid');
+            this.toplist.push({fid: this.fid, name: '地区管理'});
         },
     }
 </script>

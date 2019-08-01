@@ -27,16 +27,6 @@
             </el-table-column>
         </el-table>
         <el-button type="primary" size="medium" @click="adduser">新增</el-button>
-        <!--<el-button @click="userfrist">首页</el-button>-->
-        <!--<el-pagination-->
-                <!--style="display: inline-block"-->
-                <!--@size-change="handleSizeChange"-->
-                <!--@current-change="handleCurrentChange"-->
-                <!--:page-size=pagesize-->
-                <!--layout="prev, pager, next,jumper"-->
-                <!--:total=total>-->
-        <!--</el-pagination>-->
-        <!--<el-button @click="userlast">尾页</el-button>-->
         <pages
                 style="display: inline-block"
                 :total=total
@@ -62,6 +52,7 @@
     import ElRow from "element-ui/packages/row/src/row";
     import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
     import ElCol from "element-ui/packages/col/src/col";
+    import storageUtil from '../util/storageUtil'
     import {queryDictForPage} from '../api'
     import {dictInsert} from '../api'
     import {dictDelete} from '../api'
@@ -195,9 +186,13 @@
                 this.id = this.list[index]._id;
                 this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
             },
+            selectDict(){
+                console.log('我是fi111d',storageUtil.read('fid'));
+            },
             //分页查询数据
             async queryDictForPageChSon(fid, page, rows) {
                 try {
+                    console.log('我是fid2',fid);
                     let result = await queryDictForPage({fid: fid, page: page, rows: rows}, "GET");
                     if (result.code == 0) {
                         this.list = result.data.list;
@@ -279,8 +274,10 @@
         },
         //在渲染成html后调用 获取字典数据
         mounted() {
+
             this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
         },
+
     }
 </script>
 <style>
