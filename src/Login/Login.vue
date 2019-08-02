@@ -1,9 +1,8 @@
 <template>
     <div class="login">
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px"
+                 class="demo-ruleForm">
         <img src="./image/d33253cf28752ec3b2be854e4043ea5.png"/>
-        <div class="from">
-            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="10px"
-                     class="demo-ruleForm">
                 <p>登录用户名密码</p>
                 <el-form-item prop="username">
                     <el-input v-model="ruleForm2.username" placeholder="账号" size="20px" maxlenhth="10"></el-input>
@@ -18,7 +17,6 @@
                 </el-form-item>
             </el-form>
         </div>
-    </div>
 </template>
 <script>
     import ElFormItem from "../../node_modules/element-ui/packages/form/src/form-item.vue";
@@ -139,11 +137,12 @@
 </script>
 <style scoped>
     .login {
-        margin: 100px auto;
+        margin: 20% auto;
         width: 350px;
+        height:100vh;
         text-align: center;
-        background-image: url("image/4ef7b0258ce5a7f4f4e133d6c2b0814.png");
-        background-size: 100% 100%;
+        /*background-image: url("image/4ef7b0258ce5a7f4f4e133d6c2b0814.png");*/
+        /*background-size: 100% 100%;*/
     }
 
     .login img {
@@ -152,11 +151,9 @@
         height: 200px;
     }
 
-    .from {
-        margin-top: 20px;
-    }
 
-    .from p {
-        margin-left: 19px;
-    }
+
+    /*.from p {*/
+        /*margin-left: 19px;*/
+    /*}*/
 </style>

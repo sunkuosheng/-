@@ -9,10 +9,18 @@
             <el-button type="primary" size="medium" @click="selectuser">查询</el-button>
         </el-row>
         <el-table :data="list">
+            <!--<el-table-column-->
+                    <!--label="序号"-->
+                    <!--type="index"-->
+                    <!--width="50">-->
+            <!--</el-table-column>-->
             <el-table-column
+                    fixed
                     label="序号"
-                    type="index"
                     width="50">
+                <template slot-scope="scope">
+                    <span>{{scope.$index+1+(Pages-1)*pagesize}}</span>
+                </template>
             </el-table-column>
             <el-table-column
                     prop="name"
@@ -28,7 +36,7 @@
         <pages
                 style="display: inline-block"
                 :total=total
-                :currentPage=currentPage
+                :currentPage=Pages
                 :pageSize=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
@@ -52,32 +60,32 @@
                 list: [],
                 total: 1000,
                 pagesize: 5,
-                currentPage: 1,
+                Pages: 1,
                 id: '',
             }
         },
         methods: {
             //查询
             selectuser() {
-                console.log(this.input);
-                this.currentPage = 1;
+                this.Pages = 1;
+                console.log('我是pages',this.Pages);
                 this.queryMenuForPage(this.input);
             },
             filterHandle(value, row) {
                 return this.input === row.name;
             },
-            handleCurrentChange: function (currentPage) {
-                this.currentPage = currentPage;
+            handleCurrentChange: function (Pages) {
+                this.Pages = Pages;
                 this.queryMenuForPage(this.input);
             },
             //首页
             userfrist() {
-                this.currentPage = 1;
+                this.Pages = 1;
                 this.queryMenuForPage(this.input);
             },
             //尾页
             userlast() {
-                this.currentPage = (this.total / this.pagesize);
+                this.Pages = (this.total / this.pagesize);
                 this.queryMenuForPage(this.input);
             },
             //菜单查询
@@ -85,11 +93,11 @@
                 try {
                     let result = await queryMenuForPage({
                         queryName: queryName,
-                        page: this.currentPage,
+                        page: this.Pages,
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
-                        console.log(result);
+                        console.log('我是pages2',this.Pages);
                         this.list = result.data.list;
                         this.total = result.data.count;
                     }

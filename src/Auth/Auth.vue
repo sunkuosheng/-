@@ -9,10 +9,18 @@
             <el-button type="primary" size="medium" @click="selectuser">查询</el-button>
         </el-row>
         <el-table :data="list">
+            <!--<el-table-column-->
+                    <!--label="序号"-->
+                    <!--type="index"-->
+                    <!--width="50">-->
+            <!--</el-table-column>-->
             <el-table-column
+                    fixed
                     label="序号"
-                    type="index"
                     width="50">
+                <template slot-scope="scope">
+                    <span>{{scope.$index+1+(currentPage-1)*pagesize}}</span>
+                </template>
             </el-table-column>
             <el-table-column
                     prop="name"

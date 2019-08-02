@@ -1,14 +1,28 @@
 <template>
     <div class="el-main">
-        <el-row>
-            <li>基础服务</li>
-            <li v-for="(tops,index) in toplist" @click="topclick(index)">>{{tops.name}}</li>
-        </el-row>
+        <!--<el-row>-->
+            <!--<li>基础服务</li>-->
+            <!--<li v-for="(tops,index) in toplist" @click="topclick(index)">>{{tops.name}}</li>-->
+        <!--</el-row>-->
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item>基础服务</el-breadcrumb-item>
+            <!--<el-breadcrumb-item ><a href="#" @click.prevent="go(-1, 0)" style="cursor: hand">地区管理</a></el-breadcrumb-item>-->
+            <el-breadcrumb-item style="cursor: hand" v-for="(tops, index) in toplist" :key="index"><a href="#" @click.prevent="topclick(index)">{{tops.name}}</a></el-breadcrumb-item>
+        </el-breadcrumb>
+
         <el-table :data="list">
+            <!--<el-table-column-->
+                    <!--label="序号"-->
+                    <!--type="index"-->
+                    <!--width="50">-->
+            <!--</el-table-column>-->
             <el-table-column
+                    fixed
                     label="序号"
-                    type="index"
                     width="50">
+                <template slot-scope="scope">
+                    <span>{{scope.$index+1+(currentPage-1)*pagesize}}</span>
+                </template>
             </el-table-column>
             <el-table-column
                     prop="name"
@@ -57,9 +71,11 @@
     import {queryDeptOne} from '../api'
     import {deptUpdate} from '../api'
     import storageUtil from '../util/storageUtil'
+    import ElBreadcrumb from "../../node_modules/element-ui/packages/breadcrumb/src/breadcrumb.vue";
 
     export default {
         components: {
+            ElBreadcrumb,
             ElCol,
             ElButton,
             ElRow

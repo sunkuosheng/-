@@ -1,27 +1,9 @@
 <template>
     <div class="header">
         <el-header style="padding: 0px">
+
             <el-row>
-                <div class="top">
-                    <el-col :span="5" style="height: 100%">
-                        <img src="../image/70319f7290452f66e9cc7d236f5133d.png" style="height: 100%;width: 100%"/>
-                    </el-col>
-                    <el-col :span="12" style="height: 100%">
-                    </el-col>
-                    <el-col :span="3" style="height: 100%;line-height:50px">
-                        <el-dropdown>
-                            <span class="el-dropdown-link" style="display: inline-block">欢迎你:{{name}}</span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item><span @click="out">退出登录</span></el-dropdown-item>
-                            </el-dropdown-menu>
-                        </el-dropdown>
-                    </el-col>
-                    <el-col :span="1" style="height: 100%;line-height:50px">
-                    </el-col>
-                    <el-col :span="3" style="height: 100%;line-height:50px">
-                        <span class="el-dropdown-link" style="display: inline-block">{{deptname}}</span>
-                    </el-col>
-                </div>
+                <top-header></top-header>
             </el-row>
         </el-header>
         <el-main>
@@ -42,9 +24,14 @@
     import {loadLoginerRoleMenus} from '../api'
     import {queryDeptList} from '../api'
     import {queryRoleForPage} from '../api'
+    import {userInfo} from '../api'
     import ElCol from "element-ui/packages/col/src/col";
+    import topHeader from './Header.vue'
+    import ElRow from "element-ui/packages/row/src/row";
     export default {
-        components: {ElCol},
+        components: {
+            ElRow,
+            ElCol,topHeader},
         name: 'HelloWorld',
         data() {
             return {
@@ -61,7 +48,10 @@
         methods: {
             //路由跳转 根据address字段
             handleNodeClick(data) {
-                this.$router.replace(data.address);
+                //点击父节点不跳转
+                if(data.children==undefined||data.children.length==0) {
+                    this.$router.replace(data.address);
+                }
             },
             //登陆人权限请求
             async loadLoginerRoleMenus(loginName) {
@@ -83,6 +73,7 @@
                                 }
                             }
                         }
+                        console.log('我是被赋值了type',menuArr);
                         //过滤type不等于Checked或者不等于HalfChecked
                         let smenuArr = [];
                         for (let c = 0; c < menuArr.length; c++) {
@@ -144,8 +135,6 @@
                     if (result.code == 0) {
                         //    清除本地sessionId 用户名 地区
                         storageUtil.saveBasic("sessionId","");
-                        storageUtil.save("loginName","");
-                        storageUtil.save("deptName","");
                         this.$message.success('退出成功');
                         this.$router.replace("/");
                     }
@@ -159,7 +148,7 @@
             },
         },
         //html渲染之后
-        mounted() {
+        async mounted() {
             //读取登录用户名
             this.name = storageUtil.read('loginName');
             //读取用户名 最高级地区
