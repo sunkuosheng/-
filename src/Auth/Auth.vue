@@ -38,7 +38,7 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=currentPage
-                :pageSize=pagesize
+                :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
         <el-dialog title="设置权限" :visible.sync="dialogTableVisible">

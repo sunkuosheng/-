@@ -38,7 +38,7 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=currentPage
-                :pageSize=pagesize
+                :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
         <el-dialog title="批量添加用户" :visible.sync="dialogFormVisible">

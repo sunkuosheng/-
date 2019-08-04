@@ -37,7 +37,7 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=Pages
-                :pageSize=pagesize
+                :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
     </div>
@@ -91,12 +91,15 @@
             //菜单查询
             async queryMenuForPage(queryName) {
                 try {
+                    console.log('我是pages2',this.Pages);
+                    console.log('我是pagesize',this.pagesize);
                     let result = await queryMenuForPage({
                         queryName: queryName,
                         page: this.Pages,
                         rows: this.pagesize
                     }, "GET");
                     if (result.code == 0) {
+                      console.log('查询返回的结果',result);
                         console.log('我是pages2',this.Pages);
                         this.list = result.data.list;
                         this.total = result.data.count;

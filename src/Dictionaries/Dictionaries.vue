@@ -38,12 +38,12 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=currentPage
-                :pageSize=pagesize
+                :row=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
-        <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible">
-            <el-form :model="form">
-                <el-form-item label="字典名称" :label-width="formLabelWidth">
+        <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+            <el-form :rules="rules" :model="form" ref="form">
+                <el-form-item label="字典名称" prop="name" :label-width="formLabelWidth" >
                     <el-input v-model="form.name" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
@@ -72,6 +72,15 @@
             ElRow
         },
         data() {
+//            let validateUsername = (rule, value, callback) => {
+//                if (value === '') {
+//                    this.rulesname=false;
+//                    callback(new Error('请输入用户名'));
+//                }
+//                this.rulesname=true;
+//                callback();
+//
+//            };
             return {
                 input: '',
                 dialogFormVisible: false,
@@ -84,6 +93,12 @@
                     fid: '',
                     _id: ''
                 },
+
+                rules:{
+                    name:[
+                        {required: true, message: '请输入字典的名称', trigger: 'blur'}
+                    ]
+                },
                 toplist: [{
                     fid: '0',
                     name: '字典管理'
@@ -92,6 +107,7 @@
                 index: '',
                 formLabelWidth: '120px',
                 update: false,
+                rulesname:false,
                 list: [],
                 total: 1000,//默认数据总数
                 pagesize: 10,//每页的数据条数
@@ -111,12 +127,14 @@
             },
             //回填
             handleEdit(index, row) {
+                this.queryDictOne(row._id);
                 this.index = index;
                 this.dialogFormVisible = true;
                 console.log(row._id);
-                this.form = row;
+                this.form._id=row._id;
+//                this.form = row;
                 //中断form和list集合的联动，list重新获取一下数据
-                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
+//                this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                 this.update = true;
             },
             //删除
@@ -139,7 +157,16 @@
             //修改和增加
             add() {
                 //true是修改
+                let bool = false;
+                this.$refs.form.validate((valid) => {
+                        bool = valid;
+                    console.log('bool',valid);
+                });
+                if(!bool){
+                    return;
+                }
                 if (this.update) {
+                    console.log('修改',this.update);
                     let tableName = this.form.name;
                     let tableId = this.form._id;
                     this.dictUpdate(tableId, tableName);
@@ -148,6 +175,7 @@
                 }
                 //false是添加
                 else {
+                    console.log('添加',this.update);
                     let fid = this.id;
                     //判断fid是为空
                     //初始值为空代表父级
@@ -218,6 +246,7 @@
                 try {
                     let result = await dictInsert({name: name, fid: fid}, "POST");
                     if (result.code == 0) {
+                        this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                         this.$message.success('添加成功');
                     }
                     else {
@@ -232,11 +261,11 @@
             async dictDelete(id) {
                 try {
                     let result = await dictDelete({id: id}, "GET");
-                    console.log(result);
-                    this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                     if (result.code == 0) {
+                        this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                         if (result.data.status === -1) {
                             this.$message.error('字典还有对应的字典项无法删除');
+                            this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                         }
                     }
                     else {
@@ -252,6 +281,8 @@
                 try {
                     let result = await queryDictOne({id: id}, "GET");
                     if (result.code == 0) {
+                        console.log(result.data.name);
+                        this.form.name=result.data.name
                         this.$message.success('回填成功');
                     }
                     else {
@@ -266,7 +297,9 @@
             async dictUpdate(id, name) {
                 try {
                     let result = await dictUpdate({id: id, name: name}, "POST");
+                    console.log(result);
                     if (result.code == 0) {
+                        this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
                         this.$message.success('修改成功');
                     }
                     else {

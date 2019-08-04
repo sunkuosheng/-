@@ -55,7 +55,7 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=currentPage
-                :pageSize=pagesize
+                :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
     </div>

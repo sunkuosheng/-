@@ -45,7 +45,7 @@
                 style="display: inline-block"
                 :total=total
                 :currentPage=currentPage
-                :pageSize=pagesize
+                :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
         <el-dialog title="创建地区" :visible.sync="dialogFormVisible">

@@ -1,43 +1,41 @@
 <template>
     <div>
+        <el-button :disabled="firstDisabled" @click="toFirstPage" size="mini">首页</el-button>
         <el-pagination
-                background
+                layout="prev, pager, next"
+                :page-size="rows"
+                :total="total"
                 @current-change="handleCurrentChange"
-                :current-page="currentPageNum"
-                :page-size="pageSize"
-                layout="slot,prev"
-                :total="total">
-            <el-button :disabled="firstPageBtnDisabled" class="first-pager" @click="toFirstPage">首页</el-button>
+                :current-page.sync="currentPage"
+                style="display: inline-block;padding-right: 0px;">
         </el-pagination>
+        <el-button :disabled="isLastDisabled" @click="toLastPage" size="mini">尾页</el-button>
         <el-pagination
-                background
+                layout="jumper"
+                :page-size="rows"
+                :total="total"
                 @current-change="handleCurrentChange"
-                :current-page="currentPageNum"
-                :page-size="pageSize"
-                layout="pager,next,slot,jumper"
-                :total="total">
-            <el-button :disabled="lastPageBtnDisabled" class="last-pager" @click="toLastPage">尾页</el-button>
+                :current-page.sync="currentPage"
+                style="display: inline-block;padding-left: 0px;">
         </el-pagination>
     </div>
+
 </template>
+
 <script>
     export default {
-        name: "pages",
-        components: {},
-        data() {
+        data () {
             return {
-                currentPageNum: this.currentPage,
-                firstPageBtnDisabled: true,
-                lastPageBtnDisabled: false,
-                lastPageNum: Math.ceil(this.total / this.pageSize)
-            };
+                totalPage: Math.ceil(this.total / this.rows),
+                firstDisabled: true
+            }
         },
         props: {
             currentPage: {
                 type: Number,
                 default: 1
             },
-            pageSize: {
+            rows: {
                 type: Number,
                 default: 10
             },
@@ -46,39 +44,36 @@
                 default: 0
             }
         },
-        watch: {
-            total(newVal, oldVal) {
-                this.total = newVal;
-                this.lastPageNum = Math.ceil(newVal / this.pageSize);
-            }
-        },
-        created() {
-        },
         methods: {
-            handleCurrentChange(val) {
-                this.firstPageBtnDisabled = val === 1 ? true : false;
-                this.lastPageBtnDisabled = val === this.lastPageNum ? true : false;
-                this.currentPageNum = val;
-                this.$emit("handleCurrentChangeSub", val);
+            handleCurrentChange (page) {
+                this.firstDisabled = page == 1 ? true : false;
+                this.$emit("handleCurrentChangeSub", page);
             },
-            toFirstPage(val) {
-                this.handleCurrentChange();
+            toFirstPage () {
+                this.handleCurrentChange(1);
             },
-            toLastPage(val) {
-                this.currentPageNum = this.lastPageNum;
-                this.handleCurrentChange(this.lastPageNum);
+            toLastPage () {
+                this.currentPage = this.totalPage;
+                this.handleCurrentChange(this.totalPage);
             }
         },
-        created() {
+        watch: {
+            total(val) {
+                this.total = val;
+                this.totalPage = Math.ceil(val / this.rows);
+            }
         },
-        mounted() {
-        },
-        destroyed() {
+        computed : {
+            isLastDisabled () {
+                if(this.totalPage <= 0){
+                    return true;
+                }
+                return this.currentPage == this.totalPage ? true : false;
+            }
         }
-    };
-</script>
-<style>
-    .el-pagination {
-        float: left;
     }
+</script>
+
+<style type="text/css">
+
 </style>
