@@ -2,6 +2,7 @@ import ajax from './ajax'
 //const BASE_URL = 'http://localhost:7001'
 // const BASE_URL = 'http://info.windd.cn/collection'
 const BASE_URL = 'http://127.0.0.1:7001'
+// const BASE_URL = 'http://10.16.5.88:7001'
 /**
  * 1. 用户登录
  */

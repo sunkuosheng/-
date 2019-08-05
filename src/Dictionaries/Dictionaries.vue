@@ -41,14 +41,15 @@
                 :row=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
-        <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+        <el-dialog title="编辑字典[项]" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
+                   :before-close="handleClose">
             <el-form :rules="rules" :model="form" ref="form">
                 <el-form-item label="字典名称" prop="name" :label-width="formLabelWidth" >
                     <el-input v-model="form.name" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button @click="callOf">取 消</el-button>
                 <el-button type="primary" @click="add">确 定</el-button>
             </div>
         </el-dialog>
@@ -124,6 +125,16 @@
                 this.queryDictForPageChSon(fid, this.currentPage, this.pagesize);
                 let unmber = this.toplist.length - index;
                 this.toplist.splice(index + 1, unmber);
+            },
+            //取消 验证清空
+            callOf(){
+                this.$refs.form.resetFields();
+                this.dialogFormVisible=false;
+            },
+            //右上角关闭 验证清空
+            handleClose() {
+              this.$refs.form.resetFields();
+                this.dialogFormVisible=false;
             },
             //回填
             handleEdit(index, row) {
@@ -314,7 +325,6 @@
         },
         //在渲染成html后调用 获取字典数据
         mounted() {
-
             this.queryDictForPageChSon(this.fid, this.currentPage, this.pagesize);
         },
 

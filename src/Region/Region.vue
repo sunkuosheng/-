@@ -48,14 +48,14 @@
                 :rows=pagesize
                 @handleCurrentChangeSub="handleCurrentChange">
         </pages>
-        <el-dialog title="创建地区" :visible.sync="dialogFormVisible">
-            <el-form :model="form">
-                <el-form-item label="地区名称" :label-width="formLabelWidth">
+        <el-dialog title="创建地区" :visible.sync="dialogFormVisible" :before-close="handleClose">
+            <el-form :rules="rules" :model="form" ref="form">
+                <el-form-item label="地区名称" prop="name" :label-width="formLabelWidth">
                     <el-input v-model="form.name" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button  @click="callOf">取 消</el-button>
                 <el-button type="primary" @click="add">确 定</el-button>
             </div>
         </el-dialog>
@@ -93,6 +93,11 @@
                     fid: '',
                     _id: ''
                 },
+                rules:{
+                    name:[
+                        {required: true, message: '请输入地区的名称', trigger: 'blur'}
+                    ]
+                },
                 toplist: [],
                 index: '',
                 formLabelWidth: '120px',
@@ -113,6 +118,16 @@
                 this.queryDeptForPage(fid, this.currentPage, this.pagesize);
                 let unmber = this.toplist.length - index;
                 this.toplist.splice(index + 1, unmber);
+            },
+            //取消 验证清空
+            callOf(){
+                this.$refs.form.resetFields();
+                this.dialogFormVisible=false;
+            },
+            //右上角关闭 验证清空
+            handleClose() {
+                this.$refs.form.resetFields();
+                this.dialogFormVisible=false;
             },
             //回填
             handleEdit(index, row) {
